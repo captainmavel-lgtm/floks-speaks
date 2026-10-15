@@ -1,20 +1,67 @@
 import type { Metadata } from "next";
+import ContactForm from "@/components/contact-form";
+import SocialList from "@/components/social-list";
 
-export const metadata: Metadata = { title: "Contact" };
+export const metadata: Metadata = {
+  title: "Contact",
+  description:
+    "Bookings, collaborations, press, or a thought on something you heard. Every enquiry gets an answer.",
+};
 
-/* Route stub. The layout shell, theme switching and nav state are live here;
-   the page content is ported in the next Phase 2 pass. Kept as a real route so
-   navigation, prefetch and the Ivory/Midnight theme switch can be tested now. */
-export default function Page() {
+export default function ContactPage() {
   return (
-    <section className="mx-auto w-full max-w-site px-(--spacing-gut) py-24">
-      <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber-ink">
-        Phase 2
-      </p>
-      <h1 className="font-display text-h1 font-bold">Contact</h1>
-      <p className="mt-5 text-lede opacity-80">
-        Shell is live. Content ports in the next pass.
-      </p>
+    <section>
+      <div className="mx-auto flex w-full max-w-site flex-wrap items-start gap-[clamp(32px,6vw,72px)] px-(--spacing-gut) py-16">
+        {/* LEFT */}
+        <div className="min-w-0 max-w-[460px] flex-[1_1_340px]">
+          <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber-ink">
+            Get in touch
+          </p>
+          <h1 className="font-editorial text-h1">Say the word.</h1>
+          <p className="mb-8 mt-5 text-lede leading-[1.7] text-midnight/78">
+            Bookings, collaborations, press, or a thought on something you
+            heard. It all reaches the same inbox.
+          </p>
+
+          <div className="mb-7 flex items-start gap-3.5 rounded-xl border border-hairline-ink bg-[#e9e2d6] p-[22px]">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#865009"
+              strokeWidth="1.6"
+              aria-hidden="true"
+              className="mt-0.5 h-[22px] w-[22px] shrink-0"
+            >
+              <path d="M3 6.5h18v11H3z" />
+              <path d="m3 7 9 6 9-6" />
+            </svg>
+            <div>
+              <p className="m-0 mb-1 font-semibold">
+                Every enquiry gets an answer.
+              </p>
+              <p className="m-0 text-[0.9375rem] leading-[1.6] text-midnight/68">
+                Including the ones that turn into a no. Bookings move fastest
+                when the date and venue come with the message.
+              </p>
+            </div>
+          </div>
+
+          {/* surface="ink" because this row sits on the Ivory page. The footer
+              passes "dark" on the very same page. That is the whole reason the
+              prop is required. */}
+          <div className="border-t border-hairline-ink pt-[26px]">
+            <p className="mb-3.5 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber-ink">
+              Or find him here
+            </p>
+            <SocialList surface="ink" />
+          </div>
+        </div>
+
+        {/* FORM */}
+        <div className="min-w-0 flex-[1_1_440px]">
+          <ContactForm />
+        </div>
+      </div>
     </section>
   );
 }

@@ -1,20 +1,144 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import {
+  RECORDINGS,
+  COLLECTIONS,
+  FEATURED_SLUG,
+  recordingBySlug,
+  formatDuration,
+  formatDate,
+} from "@/lib/content";
+import { PlayIcon } from "@/components/icons";
+import Library from "@/components/library";
 
-export const metadata: Metadata = { title: "Listen" };
+export const metadata: Metadata = {
+  title: "Listen",
+  description:
+    "Every Floks Speaks recording in one place. A new piece most weeks. Filter by theme, or search for the line you half remember.",
+};
 
-/* Route stub. The layout shell, theme switching and nav state are live here;
-   the page content is ported in the next Phase 2 pass. Kept as a real route so
-   navigation, prefetch and the Ivory/Midnight theme switch can be tested now. */
-export default function Page() {
+export default function ListenPage() {
+  const featured = recordingBySlug(FEATURED_SLUG)!;
+
   return (
-    <section className="mx-auto w-full max-w-site px-(--spacing-gut) py-24">
-      <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber-ink">
-        Phase 2
-      </p>
-      <h1 className="font-display text-h1 font-bold">Listen</h1>
-      <p className="mt-5 text-lede opacity-80">
-        Shell is live. Content ports in the next pass.
-      </p>
-    </section>
+    <>
+      {/* MASTHEAD
+          The hall photograph is 2000x1333 (3:2). It was previously capped at
+          520px, so on a wide screen cover discarded roughly half the frame and
+          the balcony and front rows were lost. Sized to its own ratio now. */}
+      <section className="lib-hero relative flex items-end overflow-hidden border-b border-hairline">
+        <div className="absolute inset-0">
+          <Image
+            src="/images/hall-listen.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="lib-hero-img object-cover"
+          />
+          <div className="lib-scrim absolute inset-0" />
+        </div>
+        <div className="relative z-10 mx-auto w-full max-w-site px-(--spacing-gut) py-(--lib-pad)">
+          <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber">
+            The Library
+          </p>
+          <h1 className="font-display text-h1 font-bold leading-[1.06]">
+            Every word, in one place.
+          </h1>
+          <p className="mt-5 max-w-[46ch] text-lede leading-[1.7] text-ivory/86">
+            A new piece most weeks. Filter by theme, or search for the line you
+            half remember.
+          </p>
+        </div>
+      </section>
+
+      {/* FEATURED */}
+      <section className="border-b border-hairline">
+        <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-14">
+          <p className="mb-6 text-eyebrow font-semibold uppercase tracking-[0.16em] text-ivory/66">
+            Start here
+          </p>
+          <div className="flex flex-wrap gap-8 rounded-2xl border border-hairline bg-charcoal p-5 shadow-[0_12px_32px_rgba(0,0,0,.4)] sm:p-8">
+            <div className="min-w-[180px] flex-[0_1_220px]">
+              <Image
+                src={`/images/${featured.coverAsset}`}
+                alt={`${featured.title}, episode artwork`}
+                width={440}
+                height={440}
+                sizes="(max-width: 640px) 100vw, 220px"
+                className="aspect-square w-full rounded-xl border border-hairline object-cover"
+              />
+            </div>
+            <div className="min-w-0 flex-[1_1_380px]">
+              {/* A theme label, not a control. It previously carried
+                  aria-pressed, which made screen readers announce a static
+                  badge as a toggle button (WCAG 4.1.2). */}
+              <span className="inline-block rounded-full border border-lilac/[0.42] px-3.5 py-[7px] text-[0.6875rem] uppercase tracking-[0.14em] text-lilac">
+                {featured.theme}
+              </span>
+              <h2 className="font-editorial mt-[18px] mb-3.5 text-h2-ed">
+                {featured.title}
+              </h2>
+              <p className="mb-6 text-lede leading-[1.7] text-ivory/86">
+                Pidgin, plainly meant. It is Jesus who rules. Two minutes on the
+                authority that sits above every circumstance you are standing in.
+              </p>
+              <div className="flex flex-wrap items-center gap-[18px]">
+                <button
+                  type="button"
+                  disabled
+                  title="Audio arrives in Phase 4"
+                  className="inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full bg-amber px-[30px] text-[0.9375rem] font-semibold text-midnight disabled:opacity-60"
+                >
+                  <PlayIcon className="h-[15px] w-[13px] fill-midnight" />
+                  Play
+                </button>
+                <span className="text-[0.8125rem] text-ivory/66">
+                  {formatDuration(featured.durationSec)} &middot;{" "}
+                  {formatDate(featured.publishedAt)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SEARCH, FILTERS AND THE GRID
+          Client island: everything above this is static and streams first. */}
+      <Library recordings={RECORDINGS} />
+
+      {/* COLLECTIONS */}
+      <section className="border-t border-hairline">
+        <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-14">
+          <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber">
+            Collections
+          </p>
+          <h2 className="font-display mb-8 text-h2 font-semibold">
+            Pieces that belong together, in the order they are meant to be heard.
+          </h2>
+          <div className="grid gap-6 sm:grid-cols-2">
+            {COLLECTIONS.map((c) => (
+              <article
+                key={c._id}
+                className="rounded-2xl border border-hairline bg-charcoal p-6"
+              >
+                <h3 className="font-display text-[1.375rem] font-semibold">
+                  {c.title}
+                </h3>
+                <p className="mt-2.5 text-ivory/72">{c.description}</p>
+                <p className="mt-4 text-[0.8125rem] text-ivory/66">
+                  {c.recordingSlugs.length} recordings
+                </p>
+              </article>
+            ))}
+            <div className="rounded-2xl border border-dashed border-edge-dark p-6">
+              <p className="text-ivory/66">
+                More collections to come. Floks groups pieces as the library grows.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

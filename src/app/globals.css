@@ -124,6 +124,352 @@ a[class*="btn"] {
 }
 
 /* ============================================================================
+   LISTEN MASTHEAD
+   The hall photograph is 2000x1333 (3:2). It was once capped at 520px, so on
+   a wide screen cover discarded roughly half the frame and the balcony and
+   front rows were lost; the height follows the picture's own ratio instead.
+
+   The scrim is two gradients, not one: the left-weighted pass carries the
+   heading, the foot pass carries the lede and meets the section below without
+   a seam. Both are needed. Measured over the photograph, the heading is
+   6.4:1 and the eyebrow 5.8:1 at the worst pixel under any glyph.
+   ========================================================================= */
+
+.lib-hero {
+  height: min(66.667vw, 85vh, 880px);
+  min-height: 430px;
+  --lib-pad: clamp(40px, 6vw, 72px);
+}
+
+/* Same flex trap as the homepage hero: .lib-hero is a flex row, so the copy
+   block is a flex item that sizes to its content and gets centred by the auto
+   margins unless it is told to fill. */
+.lib-hero > div:last-child {
+  width: 100%;
+}
+
+.lib-hero-img {
+  object-position: 50% 50%;
+  filter: saturate(1.04) contrast(1.03);
+}
+
+.lib-scrim {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(17, 17, 22, 0.93) 0%,
+      rgba(17, 17, 22, 0.84) 34%,
+      rgba(17, 17, 22, 0.42) 62%,
+      rgba(17, 17, 22, 0.3) 100%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(17, 17, 22, 0.9) 0%,
+      rgba(17, 17, 22, 0.5) 34%,
+      rgba(17, 17, 22, 0.3) 100%
+    );
+}
+
+/* Mobile is art-directed like the homepage: the photograph runs at its own
+   3:2 above the copy rather than being cropped to a letterbox strip. */
+@media (max-width: 780px) {
+  .lib-hero {
+    height: auto;
+    min-height: 0;
+    display: block;
+    --lib-pad: 4px;
+  }
+  .lib-hero > div:first-child {
+    position: relative;
+    inset: auto;
+    aspect-ratio: 3 / 2;
+  }
+  .lib-scrim {
+    background: linear-gradient(
+      0deg,
+      rgba(17, 17, 22, 0.97) 0%,
+      rgba(17, 17, 22, 0.34) 40%,
+      transparent 70%
+    );
+  }
+  .lib-hero > div:last-child {
+    padding-block: 4px 40px;
+  }
+}
+
+/* ============================================================================
+   THE JOURNEY TIMELINE  (About)
+   Element styles rather than utilities: every step repeats the same eight
+   rules, and the marker needs ::before, which has no utility equivalent that
+   stays readable. Ivory surface only.
+   ========================================================================= */
+
+.road {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 760px;
+}
+
+.step {
+  position: relative;
+  padding: 0 0 36px 42px;
+  border-left: 1px solid rgba(17, 17, 22, 0.18);
+}
+
+/* the last step has no following node, so the rail would run past the final
+   paragraph and stop in mid air */
+.step:last-child {
+  border-left-color: transparent;
+  padding-bottom: 0;
+}
+
+.step::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 5px;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: var(--color-ivory);
+  border: 2px solid rgba(17, 17, 22, 0.3);
+}
+
+/* Amber Deep, not Amber: this marker sits on Ivory, where plain Amber is
+   1.9:1. Deep is 3.00:1, which clears 1.4.11 for a non-text element. */
+.step.is-major::before {
+  width: 15px;
+  height: 15px;
+  left: -8px;
+  background: var(--color-amber-deep);
+  border-color: var(--color-amber-deep);
+  box-shadow: 0 0 0 4px rgba(198, 118, 13, 0.16);
+}
+
+.step .yr {
+  margin: 0 0 6px;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(17, 17, 22, 0.6);
+  font-weight: 600;
+  /* dates line up down the rail */
+  font-variant-numeric: tabular-nums;
+}
+
+.step.is-major .yr {
+  color: var(--color-amber-ink);
+}
+
+.step h3 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.step.is-major h3 {
+  font-size: 1.1875rem;
+}
+
+.step .kind {
+  margin: 0 0 8px;
+  display: inline-block;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--color-lilac-ink);
+  border: 1px solid rgba(105, 79, 145, 0.42);
+  border-radius: 999px;
+  padding: 4px 11px;
+}
+
+.step .body {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(17, 17, 22, 0.74);
+  max-width: 62ch;
+}
+
+/* ============================================================================
+   LEGAL PROSE  (Privacy, Terms)
+   These two pages are long-form text with no per-element decisions, so the
+   measure, rhythm and link colour are set once here rather than on each of
+   roughly ninety elements.
+   ========================================================================= */
+
+.doc {
+  max-width: var(--container-read);
+}
+
+.doc h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.3rem, 2.4vw, 1.6rem);
+  margin: 48px 0 14px;
+}
+
+.doc h2:first-of-type {
+  margin-top: 8px;
+}
+
+.doc p,
+.doc li,
+.doc dd {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: rgba(17, 17, 22, 0.8);
+}
+
+.doc p {
+  margin: 0 0 16px;
+}
+
+.doc ul {
+  margin: 0 0 16px;
+  padding-left: 22px;
+  list-style: disc;
+}
+
+.doc li {
+  margin-bottom: 9px;
+}
+
+.doc dl {
+  margin: 0 0 16px;
+}
+
+.doc dt {
+  font-weight: 600;
+  margin-top: 16px;
+}
+
+.doc dd {
+  margin: 4px 0 0;
+}
+
+.doc strong {
+  font-weight: 600;
+  color: var(--color-midnight);
+}
+
+/* Amber Ink, 5.69:1. Plain Amber on Ivory is 1.9:1 and would fail at body
+   size, which is the only size these links appear at. */
+.doc a {
+  color: var(--color-amber-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ============================================================================
+   CONTACT FORM
+   ========================================================================= */
+
+.field {
+  margin-bottom: 22px;
+}
+
+.field label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 9px;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  min-height: 52px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  /* boundary token, not a hairline: the border is the only thing marking the
+     field, so it must clear 3:1 */
+  border: 1px solid var(--color-edge-ink);
+  background: var(--color-ivory);
+  color: var(--color-midnight);
+  transition: border-color 0.18s;
+}
+
+.field textarea {
+  line-height: 1.6;
+  resize: vertical;
+}
+
+/* 2px so the focus ring is visible against the resting 1px border without
+   relying on colour alone */
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--color-amber-deep);
+  border-width: 2px;
+  outline: none;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--color-placeholder-ink);
+  opacity: 1;
+}
+
+.pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 11px 20px;
+  border: 1px solid var(--color-edge-ink);
+  border-radius: 999px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    background 0.18s;
+}
+
+.pick:hover {
+  border-color: var(--color-midnight);
+}
+
+.pick input {
+  accent-color: var(--color-amber-deep);
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+/* The selected state is carried by fill, weight and the radio dot together,
+   never by colour on its own (WCAG 1.4.1). */
+.pick:has(input:checked) {
+  background: var(--color-midnight);
+  color: var(--color-ivory);
+  border-color: var(--color-midnight);
+  font-weight: 600;
+}
+
+.pick:has(input:focus-visible) {
+  outline: 2px solid var(--color-amber-deep);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   JOURNAL GRID
+   auto-fill, deliberately, not auto-fit. auto-fit collapses the empty tracks,
+   so with one published article the single card stretched the full 1280px and
+   the excerpt ran at roughly 140 characters a line. auto-fill holds the empty
+   tracks open, so one card is card width. An open article takes the whole row
+   (col-span-full) and caps its measure at 68ch in the component.
+   ========================================================================= */
+
+.journal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+/* ============================================================================
    HOMEPAGE HERO
    Geometry is documented in Design Handoff v31 section 9. These rules live in
    CSS rather than utilities because they are derived measurements, not scale
