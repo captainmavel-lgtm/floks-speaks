@@ -1,0 +1,26 @@
+# Netlify configuration
+#
+# The Next.js runtime is detected and installed by Netlify, so no plugin is
+# declared here. Node is pinned so a CI build cannot silently move to a
+# different major version from the one the site was verified on.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Build Bible phase 7: staging must not be indexable. The noindex itself is
+# applied in next.config.ts, keyed on Netlify's CONTEXT variable, so it
+# travels with the build rather than depending on a header file that a future
+# redirect could bypass. These two contexts exist to make the intent explicit
+# and to give each one somewhere to hang context-only variables later.
+[context.production.environment]
+  NEXT_PUBLIC_SITE_ENV = "production"
+
+[context.deploy-preview.environment]
+  NEXT_PUBLIC_SITE_ENV = "preview"
+
+[context.branch-deploy.environment]
+  NEXT_PUBLIC_SITE_ENV = "staging"
