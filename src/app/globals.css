@@ -1,26 +1,294 @@
 @import "tailwindcss";
 
+/* ============================================================================
+   FLOKS SPEAKS  ·  DESIGN TOKENS
+   Ported from the Phase 1 prototype. Values are the audited set in Design
+   Handoff v31 section 4. Tailwind v4 is CSS-first, so the theme lives here
+   rather than in tailwind.config.js.
+
+   RULE: no hard-coded hex in components. Every colour comes from a token.
+   The Ink and Deep counterparts exist only so Amber and Lilac have legal
+   equivalents on Ivory surfaces. Never use amber or lilac as text on Ivory.
+   ========================================================================= */
+
+@theme {
+  /* ---- surfaces ---- */
+  --color-midnight: #111116;
+  --color-charcoal: #22232b;
+  --color-ivory: #f2ede5;
+
+  /* ---- accents, dark surfaces only ---- */
+  --color-amber: #f2a33a;
+  --color-lilac: #b5a5ce;
+
+  /* ---- accents, Ivory surfaces only ---- */
+  --color-amber-ink: #865009;   /* 5.69:1 on Ivory. Body-size text, links, icons. */
+  --color-amber-deep: #c6760d;  /* 3.00:1 on Ivory. Large text and UI strokes only. */
+  --color-lilac-ink: #694f91;   /* 5.76:1 on Ivory. Chip labels, category text.    */
+  --color-lilac-deep: #957eb9;  /* 3.02:1 on Ivory. Large text and chip borders.   */
+
+  /* ---- brand ---- */
+  --color-logo-navy: #20243f;
+
+  /* ---- decorative hairlines. NOT for control boundaries, see below ---- */
+  --color-hairline: rgba(242, 237, 229, 0.14);
+  --color-hairline-ink: rgba(17, 17, 22, 0.12);
+
+  /* ---- control boundaries. These carry their own values because the
+          boundary is often the only thing marking the control (WCAG 1.4.11
+          needs 3:1). Using a hairline token here is the defect v30 found. ---- */
+  --color-edge-dark: rgba(242, 237, 229, 0.4);   /* 3.45:1 on Midnight */
+  --color-edge-ink: rgba(17, 17, 22, 0.48);      /* 3.22:1 on Ivory    */
+  --color-edge-ghost-dark: rgba(242, 237, 229, 0.42);
+  --color-placeholder-dark: rgba(242, 237, 229, 0.66);  /* 7.09:1 */
+  --color-placeholder-ink: rgba(17, 17, 22, 0.66);      /* 5.72:1 */
+
+  /* ---- type families ---- */
+  --font-display: var(--font-sora), sans-serif;
+  --font-editorial: var(--font-playfair), serif;
+  --font-ui: var(--font-inter), sans-serif;
+
+  /* ---- type scale, handoff v31 section 5. rem throughout so the reader's
+          browser font-size setting is honoured. ---- */
+  --text-eyebrow: clamp(0.6875rem, 0.95vw, 0.8125rem);
+  --text-hero: clamp(2.4rem, 4.9vw, 4rem);
+  --text-h1: clamp(2.125rem, 4.6vw, 3rem);
+  --text-h2: clamp(1.625rem, 3vw, 2.125rem);
+  --text-h2-ed: clamp(1.75rem, 3.4vw, 2.5rem);
+  --text-card: 1.375rem;
+  --text-lede: clamp(1.0625rem, 1.8vw, 1.125rem);
+
+  /* ---- layout ---- */
+  --spacing-gut: clamp(20px, 4vw, 48px);
+  --container-site: 1280px;
+  --container-read: 720px;
+
+  /* ---- motion ---- */
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================================
+   BASE
+   ========================================================================= */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* written by the player's ResizeObserver; 0 while the player is hidden, so
+     nothing reserves space before there is anything to clear */
+  --player-h: 0px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px;
+  scroll-padding-bottom: calc(var(--player-h) + 16px);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-midnight);
+  color: var(--color-ivory);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Light pages set data-theme="light" on <body>. Any shared component that must
+   look the same on both themes pins its own surface rather than inheriting.
+   Three live defects came from ignoring this: handoff v31 section 3. */
+body[data-theme="light"] {
+  background: var(--color-ivory);
+  color: var(--color-midnight);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* Controls that hold text must grow with the reader's text size, so min-height
+   rather than height. Four controls clipped their labels before this. */
+button,
+a[class*="btn"] {
+  min-height: 44px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ============================================================================
+   HOMEPAGE HERO
+   Geometry is documented in Design Handoff v31 section 9. These rules live in
+   CSS rather than utilities because they are derived measurements, not scale
+   steps, and they need comments to survive a future edit.
+   ========================================================================= */
+
+.hero {
+  /* capped at the photograph's own ratio so the whole frame shows, and at the
+     viewport below the sticky header so the buttons can never fall out of view */
+  height: min(90svh, calc(100svh - 77px));
+  min-height: 520px;
+  --hero-pad: clamp(28px, 3.4vw, 56px);
+}
+
+.hero-img {
+  /* the raised hand sits at the top edge, so hold the anchor high and let any
+     crop fall off the lower body rather than the hand or the face */
+  object-position: 58% 12%;
+  filter: saturate(1.04) contrast(1.02);
+}
+
+.hero-scrim {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(17, 17, 22, 0.94) 0%,
+      rgba(17, 17, 22, 0.9) 28%,
+      rgba(17, 17, 22, 0.74) 46%,
+      rgba(17, 17, 22, 0.34) 60%,
+      rgba(17, 17, 22, 0) 76%
+    ),
+    /* short foot fade so the hero meets the next dark section without a seam */
+    linear-gradient(
+      0deg,
+      var(--color-midnight) 0%,
+      rgba(17, 17, 22, 0.55) 7%,
+      rgba(17, 17, 22, 0) 22%
+    );
+}
+
+/* .hero is a flex row, so this is a flex item: it sizes to its content and the
+   auto margins centre it. Without width:100% the copy slides right over Felix's
+   face whenever the type scale changes. That defect is easy to reintroduce. */
+.hero > div:last-child {
+  width: 100%;
+}
+
+.hero-copy {
+  /* The amber line "Truth That Transforms." must hold one line. The variable
+     cut of Sora renders it at 694px at 64px, wider than the 652px the static
+     cut needed in the prototype, so this cap is set from a measurement rather
+     than carried over. It ends at roughly 57% of the hero, clear of Felix,
+     whose core mass starts at 63%. */
+  max-width: min(62%, 720px);
+}
+
+/* A stage lamp at ~53% across and ~61% down the photograph lands behind the
+   amber headline on window shapes where the frame sits almost uncropped, and
+   measured 1.09:1 there. Darkening the main scrim far enough to cover it greys
+   out the amber, so the lift is local, anchored left, faded out before Felix. */
+.hero-copy::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: min(920px, 70%);
+  background: radial-gradient(
+    135% 100% at 0% 50%,
+    rgba(17, 17, 22, 0.88) 0%,
+    rgba(17, 17, 22, 0.62) 48%,
+    rgba(17, 17, 22, 0) 82%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+.hero-spine {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%) rotate(180deg);
+  writing-mode: vertical-rl;
+  font-size: 0.6875rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: rgba(242, 163, 58, 0.85);
+  font-weight: 600;
+  z-index: 3;
+}
+
+/* Short or zoomed desktop windows (1366x768 laptops, 125-150% browser zoom)
+   have far less height than width, and the width breakpoints never fire for
+   them. These two are keyed on height for that reason. */
+@media (min-width: 781px) and (max-height: 820px) {
+  .hero {
+    --hero-pad: 22px;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 3.6vw, 2.9rem);
+  }
+}
+
+@media (min-width: 781px) and (max-height: 680px) {
+  .hero {
+    --hero-pad: 16px;
+  }
+  .hero h1 {
+    font-size: clamp(1.8rem, 3vw, 2.3rem);
+  }
+}
+
+/* Between 781 and 1100 the copy column squeezes against Felix, so it widens
+   and the anchor pans right to hold him in the narrowing frame. */
+@media (min-width: 781px) and (max-width: 1100px) {
+  .hero-copy {
+    max-width: min(64%, 560px);
+  }
+  .hero-img {
+    object-position: 66% 10%;
+  }
+}
+
+/* Mobile is art-directed, not the desktop crop shrunk. At 16:9 full-bleed on a
+   390px phone Felix occupies a third of a very wide frame and reads as a speck.
+   6:5 panned right drops the empty left field the desktop needs for text and
+   brings his face, hand, microphone and shirt up to usable size. */
+@media (max-width: 780px) {
+  .hero {
+    height: auto;
+    min-height: 0;
+    display: block;
+    --hero-pad: 8px;
+  }
+  .hero > div:first-child {
+    position: relative;
+    inset: auto;
+    aspect-ratio: 6 / 5;
+  }
+  .hero-img {
+    object-position: 80% 13%;
+  }
+  .hero-scrim {
+    background: linear-gradient(
+      0deg,
+      var(--color-midnight) 0%,
+      rgba(17, 17, 22, 0.3) 30%,
+      rgba(17, 17, 22, 0) 62%
+    );
+  }
+  .hero-copy {
+    max-width: none;
+  }
+  .hero-copy::before {
+    display: none;
+  }
+  .hero-spine {
+    display: none;
+  }
+  .hero h1 {
+    /* 8.4vw put "Truth That Transforms." 5px over the 350px content width at
+       390 and wrapped it. 8vw with a 1.8rem floor holds one line down to 360.
+       Below 360 it wraps, which is fine: three lines on a 320px phone is
+       normal typography, not a defect. */
+    font-size: clamp(1.8rem, 8vw, 2.6rem);
+  }
+  .hero .flex-wrap > a {
+    flex: 1 1 100%;
+  }
 }
