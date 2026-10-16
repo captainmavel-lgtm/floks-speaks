@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Image from "next/image";
 import {
   RECORDINGS,
   COLLECTIONS,
+  THEMES,
+  type Theme,
   FEATURED_SLUG,
   recordingBySlug,
   formatDuration,
@@ -17,7 +20,30 @@ export const metadata: Metadata = {
     "Every Floks Speaks recording in one place. A new piece most weeks. Filter by theme, or search for the line you half remember.",
 };
 
-export default function ListenPage() {
+/* A theme card on the home page links here as /listen?theme=Faith. Reading the
+   query makes this subtree dynamic, so it is isolated here behind Suspense: the
+   masthead, featured piece and collections stay static and stream first, while
+   the library arrives already narrowed with no client round trip. Anything that
+   is not one of the four themes falls back to All. */
+async function ThemedLibrary({
+  searchParams,
+}: {
+  searchParams: Promise<{ theme?: string }>;
+}) {
+  const requested = (await searchParams).theme;
+  const initialTheme: Theme | "All" = (THEMES as string[]).includes(
+    requested ?? "",
+  )
+    ? (requested as Theme)
+    : "All";
+  return <Library recordings={RECORDINGS} initialTheme={initialTheme} />;
+}
+
+export default function ListenPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ theme?: string }>;
+}) {
   const featured = recordingBySlug(FEATURED_SLUG)!;
 
   return (
@@ -105,7 +131,9 @@ export default function ListenPage() {
 
       {/* SEARCH, FILTERS AND THE GRID
           Client island: everything above this is static and streams first. */}
-      <Library recordings={RECORDINGS} />
+      <Suspense fallback={<Library recordings={RECORDINGS} />}>
+        <ThemedLibrary searchParams={searchParams} />
+      </Suspense>
 
       {/* COLLECTIONS */}
       <section className="border-t border-hairline">

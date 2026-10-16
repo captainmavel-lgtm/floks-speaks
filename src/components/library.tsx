@@ -17,9 +17,15 @@ import { PlayIcon } from "@/components/icons";
    offers the themes as a way out rather than leaving a dead end.
    ========================================================================= */
 
-export default function Library({ recordings }: { recordings: Recording[] }) {
+export default function Library({
+  recordings,
+  initialTheme = "All",
+}: {
+  recordings: Recording[];
+  initialTheme?: Theme | "All";
+}) {
   const [query, setQuery] = useState("");
-  const [theme, setTheme] = useState<Theme | "All">("All");
+  const [theme, setTheme] = useState<Theme | "All">(initialTheme);
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
