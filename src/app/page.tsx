@@ -271,7 +271,6 @@ export default function Home() {
                   label from the Sanity theme document. */}
               <div className="theme-card__label">
                 <h3 className="theme-card__title">{t}</h3>
-                <span className="theme-card__rule" aria-hidden="true" />
               </div>
             </Link>
           ))}
