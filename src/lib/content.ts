@@ -16,6 +16,17 @@ export type Theme = "Faith" | "Identity" | "Culture" | "Healing";
 
 export const THEMES: Theme[] = ["Faith", "Identity", "Culture", "Healing"];
 
+/* Background art for the home theme cards. Presentation metadata, kept here so
+   the content layer stays the single source: Phase 3 can move these onto a
+   Sanity "theme" document and nothing in the component changes. Keys match the
+   Theme union above; values are files in /public/images. */
+export const THEME_IMAGES: Record<Theme, string> = {
+  Faith: "stage-beams.jpg",
+  Identity: "portrait-felix.jpg",
+  Culture: "perf-point.jpg",
+  Healing: "wide-warm.jpg",
+};
+
 export type Recording = {
   _id: string;
   slug: string;
