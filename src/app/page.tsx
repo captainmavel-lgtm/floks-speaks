@@ -247,11 +247,11 @@ export default function Home() {
     <section className="border-b border-hairline">
       <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-14">
         <h2 className="font-display text-h2 font-semibold">Explore by theme</h2>
-        <p className="mb-11 mt-3 max-w-[54ch] text-[1.0625rem] text-ivory/66">
+        <p className="mb-12 mt-4 max-w-[54ch] text-[1.0625rem] text-ivory/66">
           Four threads running through the work. Each one opens the pieces that
           belong to it.
         </p>
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid max-w-[1040px] gap-6 sm:grid-cols-2">
           {THEMES.map((t) => (
             <Link
               key={t}
@@ -263,9 +263,16 @@ export default function Home() {
                 src={`/images/${THEME_IMAGES[t]}`}
                 alt=""
                 fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 600px"
+                sizes="(max-width: 640px) 100vw, 520px"
                 className="theme-card__img"
               />
+              <span className="theme-card__scrim" aria-hidden="true" />
+              {/* Live text, not baked into the art, so Phase 3 can drive the
+                  label from the Sanity theme document. */}
+              <div className="theme-card__label">
+                <h3 className="theme-card__title">{t}</h3>
+                <span className="theme-card__rule" aria-hidden="true" />
+              </div>
             </Link>
           ))}
         </div>

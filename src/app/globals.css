@@ -268,9 +268,12 @@ a[class*="btn"] {
 
 /* ============================================================================
    THEME CARDS  (Home, section 05)
-   Each theme is a finished cinematic banner with its title set into the art,
-   so the card carries no text of its own. The frame, the gentle zoom and the
-   amber edge on hover live here; the component is just the link and the image.
+   Cinematic banners, one per theme. Each image carries its own colour and a
+   soft inner frame; the title is live text set over the dark left of the art,
+   so Phase 3 can drive it from the CMS. The image is shown at its own ratio,
+   never cropped, so the baked frame stays whole and nothing bleeds past the
+   rounded corner. Radius and spacing follow the Build Bible (12 to 16px cards,
+   8px scale).
    ========================================================================= */
 
 .theme-card {
@@ -278,43 +281,91 @@ a[class*="btn"] {
   display: block;
   overflow: hidden;
   border-radius: 16px;
-  border: 1px solid var(--color-hairline);
   aspect-ratio: 1737 / 905;
   text-decoration: none;
   isolation: isolate;
   background: #0a0a0c;
-  transition: border-color 300ms ease;
+  /* a hairline ring on the inside tucks the image's edge glow against the
+     rounded corner, so the light is contained rather than bleeding out */
+  box-shadow: inset 0 0 0 1px rgba(242, 237, 229, 0.08);
+  transition: box-shadow 300ms ease;
 }
 
 .theme-card__img {
   object-fit: cover;
   transform: scale(1.01);
   transition:
-    transform 320ms ease,
-    filter 320ms ease;
+    transform 360ms ease,
+    filter 360ms ease;
 }
 
-/* Each banner owns its colour (gold, lilac, red, teal), so hover lifts the
-   image's own light rather than washing a single accent over all four. */
+/* Left-weighted wash: darkens the title zone, fades out before the subject on
+   the right, and keeps the left edge from glowing into the corner. */
+.theme-card__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    rgba(10, 10, 12, 0.82) 0%,
+    rgba(10, 10, 12, 0.6) 30%,
+    rgba(10, 10, 12, 0.18) 52%,
+    rgba(10, 10, 12, 0) 70%
+  );
+}
+
+.theme-card__label {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-inline: clamp(24px, 6%, 48px);
+  pointer-events: none;
+}
+
+.theme-card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--color-ivory);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.55);
+}
+
+.theme-card__rule {
+  display: block;
+  width: 40px;
+  height: 3px;
+  margin-top: 16px;
+  border-radius: 999px;
+  background: var(--color-amber);
+}
+
+/* Each banner owns its colour, so hover lifts the image's own light. */
 .theme-card:hover .theme-card__img,
 .theme-card:focus-visible .theme-card__img {
-  transform: scale(1.05);
-  filter: brightness(1.07) saturate(1.05);
+  transform: scale(1.045);
+  filter: brightness(1.06) saturate(1.04);
 }
 
 .theme-card:hover,
 .theme-card:focus-visible {
-  border-color: rgba(242, 163, 58, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(242, 163, 58, 0.5);
 }
 
+/* Build Bible focus rule: 2px Amber, offset 2px. */
 .theme-card:focus-visible {
   outline: 2px solid var(--color-amber);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .theme-card__img {
-    transition: filter 320ms ease;
+    transition: filter 360ms ease;
   }
   .theme-card:hover .theme-card__img,
   .theme-card:focus-visible .theme-card__img {
