@@ -127,9 +127,7 @@ export default function Home() {
             <div className="flex flex-wrap items-center gap-5">
               <button
                 type="button"
-                disabled
-                title="Audio arrives in Phase 4"
-                className="inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full bg-amber px-[30px] text-[0.9375rem] font-semibold text-midnight disabled:opacity-60"
+                className="inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full bg-amber px-[30px] text-[0.9375rem] font-semibold text-midnight transition-[background,transform] duration-200 hover:-translate-y-0.5 hover:bg-[#F7BD6E]"
               >
                 <PlayIcon className="h-[15px] w-[13px] fill-midnight" />
                 Play
@@ -178,10 +176,8 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <button
                   type="button"
-                  disabled
                   aria-label={`Play ${r.title}`}
-                  title="Audio arrives in Phase 4"
-                  className="inline-flex min-h-[44px] w-11 items-center justify-center rounded-full border border-edge-dark disabled:opacity-60"
+                  className="inline-flex min-h-[44px] w-11 items-center justify-center rounded-full border border-amber/50 transition-colors duration-200 hover:bg-amber/[0.16]"
                 >
                   <PlayIcon className="h-3 w-2.5 fill-amber" />
                 </button>
@@ -358,27 +354,24 @@ export default function Home() {
             >
               Shop the Collection
             </a>
-            <p className="mt-3.5 text-[0.8125rem] text-ivory/66">
-              Opens WhatsApp in a new tab.
-            </p>
           </div>
           <div className="grid grid-cols-2 gap-[clamp(10px,1.6vw,16px)]">
             {[
               [
                 "merch-floks.jpg",
-                "The Floks Speaks shirt worn, showing the chest lockup and the printed sleeve band",
-              ],
-              [
-                "merch-ebi-street.jpg",
-                "The Ebi Jesus Wey Dey Rule shirt worn on a street in Accra",
-              ],
-              [
-                "merch-ebi-shades.jpg",
-                "Close view of the Ebi Jesus Wey Dey Rule print",
+                "Felix wearing the Floks Speaks branded shirt with Ghanaian print sleeve band",
               ],
               [
                 "merch-ebi-pair.jpg",
-                "Two people wearing the Ebi Jesus Wey Dey Rule shirt",
+                "Two people wearing the Ebi Jesus Wey Dey Rule shirt in front of a JESUS sign",
+              ],
+              [
+                "merch-ebi-shades.jpg",
+                "Young man in shades wearing the Ebi Jesus Wey Dey Rule shirt",
+              ],
+              [
+                "merch-ebi-street.jpg",
+                "Felix in a yellow shirt with his portrait printed on it",
               ],
             ].map(([file, alt]) => (
               <Image

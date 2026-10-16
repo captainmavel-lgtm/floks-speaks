@@ -112,9 +112,7 @@ export default function ListenPage({
               <div className="flex flex-wrap items-center gap-[18px]">
                 <button
                   type="button"
-                  disabled
-                  title="Audio arrives in Phase 4"
-                  className="inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full bg-amber px-[30px] text-[0.9375rem] font-semibold text-midnight disabled:opacity-60"
+                  className="inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full bg-amber px-[30px] text-[0.9375rem] font-semibold text-midnight transition-[background,transform] duration-200 hover:-translate-y-0.5 hover:bg-[#F7BD6E]"
                 >
                   <PlayIcon className="h-[15px] w-[13px] fill-midnight" />
                   Play
@@ -145,23 +143,46 @@ export default function ListenPage({
             Pieces that belong together, in the order they are meant to be heard.
           </h2>
           <div className="grid gap-6 sm:grid-cols-2">
-            {COLLECTIONS.map((c) => (
-              <article
-                key={c._id}
-                className="rounded-2xl border border-hairline bg-charcoal p-6"
-              >
-                <h3 className="font-display text-[1.375rem] font-semibold">
-                  {c.title}
-                </h3>
-                <p className="mt-2.5 text-ivory/72">{c.description}</p>
-                <p className="mt-4 text-[0.8125rem] text-ivory/66">
-                  {c.recordingSlugs.length} recordings
-                </p>
-              </article>
-            ))}
-            <div className="rounded-2xl border border-dashed border-edge-dark p-6">
-              <p className="text-ivory/66">
-                More collections to come. Floks groups pieces as the library grows.
+            {COLLECTIONS.map((c) => {
+              const covers = c.recordingSlugs
+                .map((s) => recordingBySlug(s))
+                .filter(Boolean)
+                .slice(0, 4);
+              return (
+                <article
+                  key={c._id}
+                  className="rounded-2xl border border-hairline bg-charcoal p-6"
+                >
+                  <h3 className="font-display text-[1.375rem] font-semibold">
+                    {c.title}
+                  </h3>
+                  <p className="mt-2.5 text-ivory/72">{c.description}</p>
+                  {covers.length > 0 && (
+                    <div className="mt-4 flex gap-2">
+                      {covers.map((r) => (
+                        <Image
+                          key={r!._id}
+                          src={`/images/${r!.coverAsset}`}
+                          alt=""
+                          width={72}
+                          height={72}
+                          className="h-[52px] w-[52px] rounded-lg border border-hairline object-cover"
+                        />
+                      ))}
+                    </div>
+                  )}
+                  <p className="mt-3 text-[0.8125rem] font-semibold uppercase tracking-[0.08em] text-amber">
+                    {c.recordingSlugs.length} recordings
+                  </p>
+                </article>
+              );
+            })}
+            <div className="flex flex-col justify-center rounded-2xl border border-dashed border-edge-dark p-6">
+              <p className="m-0 mb-1.5 font-display text-[1.0625rem] font-semibold">
+                More collections to come.
+              </p>
+              <p className="m-0 text-[0.8125rem] leading-[1.6] text-ivory/66">
+                Floks groups pieces as the library grows.
               </p>
             </div>
           </div>

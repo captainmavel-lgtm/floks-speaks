@@ -145,10 +145,8 @@ export default function Library({
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
-                      disabled
                       aria-label={`Play ${r.title}`}
-                      title="Audio arrives in Phase 4"
-                      className="inline-flex min-h-[44px] w-11 items-center justify-center rounded-full border border-edge-dark disabled:opacity-60"
+                      className="inline-flex min-h-[44px] w-11 items-center justify-center rounded-full border border-amber/50 transition-colors duration-200 hover:bg-amber/[0.16]"
                     >
                       <PlayIcon className="h-3 w-2.5 fill-amber" />
                     </button>
