@@ -268,10 +268,9 @@ a[class*="btn"] {
 
 /* ============================================================================
    THEME CARDS  (Home, section 05)
-   Cinematic image cards, one per theme. The overlay, hover lift and arrow
-   motion live here; the component carries only structure and layout. This
-   extends the homepage hero's language of dark gradients over a photograph,
-   so the section reads as part of the same cinematic surface.
+   Each theme is a finished cinematic banner with its title set into the art,
+   so the card carries no text of its own. The frame, the gentle zoom and the
+   amber edge on hover live here; the component is just the link and the image.
    ========================================================================= */
 
 .theme-card {
@@ -280,70 +279,32 @@ a[class*="btn"] {
   overflow: hidden;
   border-radius: 16px;
   border: 1px solid var(--color-hairline);
-  aspect-ratio: 4 / 5;
-  color: var(--color-ivory);
+  aspect-ratio: 1737 / 905;
   text-decoration: none;
   isolation: isolate;
-  background: var(--color-card, #0a0a0c);
+  background: #0a0a0c;
+  transition: border-color 300ms ease;
 }
 
 .theme-card__img {
   object-fit: cover;
   transform: scale(1.01);
-  transition: transform 320ms ease;
-}
-
-/* Dark gradient from the foot, so the title and amber accent stay legible over
-   any photograph. */
-.theme-card__scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(
-    180deg,
-    rgba(10, 10, 12, 0) 28%,
-    rgba(10, 10, 12, 0.5) 66%,
-    rgba(10, 10, 12, 0.92) 100%
-  );
-}
-
-/* Amber wash that lifts on hover, pooling up from the foot like warm stage
-   light. */
-.theme-card__glow {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: radial-gradient(
-    120% 82% at 50% 112%,
-    rgba(242, 163, 58, 0.3) 0%,
-    rgba(242, 163, 58, 0) 60%
-  );
-  opacity: 0;
-  transition: opacity 320ms ease;
-}
-
-.theme-card__arrow {
   transition:
-    transform 300ms ease,
-    background 300ms ease,
-    border-color 300ms ease;
+    transform 320ms ease,
+    filter 320ms ease;
 }
 
+/* Each banner owns its colour (gold, lilac, red, teal), so hover lifts the
+   image's own light rather than washing a single accent over all four. */
 .theme-card:hover .theme-card__img,
 .theme-card:focus-visible .theme-card__img {
-  transform: scale(1.07);
+  transform: scale(1.05);
+  filter: brightness(1.07) saturate(1.05);
 }
 
-.theme-card:hover .theme-card__glow,
-.theme-card:focus-visible .theme-card__glow {
-  opacity: 1;
-}
-
-.theme-card:hover .theme-card__arrow,
-.theme-card:focus-visible .theme-card__arrow {
-  transform: translateX(4px);
-  border-color: var(--color-amber);
-  background: rgba(242, 163, 58, 0.18);
+.theme-card:hover,
+.theme-card:focus-visible {
+  border-color: rgba(242, 163, 58, 0.6);
 }
 
 .theme-card:focus-visible {
@@ -352,9 +313,8 @@ a[class*="btn"] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .theme-card__img,
-  .theme-card__arrow {
-    transition: none;
+  .theme-card__img {
+    transition: filter 320ms ease;
   }
   .theme-card:hover .theme-card__img,
   .theme-card:focus-visible .theme-card__img {

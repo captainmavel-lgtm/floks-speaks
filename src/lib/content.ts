@@ -16,15 +16,17 @@ export type Theme = "Faith" | "Identity" | "Culture" | "Healing";
 
 export const THEMES: Theme[] = ["Faith", "Identity", "Culture", "Healing"];
 
-/* Background art for the home theme cards. Presentation metadata, kept here so
-   the content layer stays the single source: Phase 3 can move these onto a
-   Sanity "theme" document and nothing in the component changes. Keys match the
-   Theme union above; values are files in /public/images. */
+/* Card art for the home theme cards. Each file is a finished banner with the
+   theme name set into the image, so the component draws no title of its own.
+   Presentation metadata, kept here so the content layer stays the single
+   source: Phase 3 can move these onto a Sanity "theme" document and nothing in
+   the component changes. Keys match the Theme union above; values are files in
+   /public/images. */
 export const THEME_IMAGES: Record<Theme, string> = {
-  Faith: "stage-beams.jpg",
-  Identity: "portrait-felix.jpg",
-  Culture: "perf-point.jpg",
-  Healing: "wide-warm.jpg",
+  Faith: "theme-faith.webp",
+  Identity: "theme-identity.webp",
+  Culture: "theme-culture.webp",
+  Healing: "theme-healing.webp",
 };
 
 export type Recording = {

@@ -251,7 +251,7 @@ export default function Home() {
           Four threads running through the work. Each one opens the pieces that
           belong to it.
         </p>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2">
           {THEMES.map((t) => (
             <Link
               key={t}
@@ -263,38 +263,9 @@ export default function Home() {
                 src={`/images/${THEME_IMAGES[t]}`}
                 alt=""
                 fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 600px"
                 className="theme-card__img"
               />
-              <span className="theme-card__scrim" aria-hidden="true" />
-              <span className="theme-card__glow" aria-hidden="true" />
-              <span
-                aria-hidden="true"
-                className="theme-card__arrow absolute right-4 top-4 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-amber/70 bg-midnight/30 text-amber backdrop-blur-sm"
-              >
-                <svg
-                  viewBox="0 0 18 18"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M3 9h11" />
-                  <path d="M9.5 4.5 14 9l-4.5 4.5" />
-                </svg>
-              </span>
-              <div className="absolute inset-x-0 bottom-0 z-10 p-5">
-                <h3 className="font-display text-[clamp(1.375rem,2vw,1.625rem)] font-bold leading-tight">
-                  {t}
-                </h3>
-                <span
-                  aria-hidden="true"
-                  className="mt-2.5 block h-[3px] w-8 rounded-full bg-amber"
-                />
-              </div>
             </Link>
           ))}
         </div>
