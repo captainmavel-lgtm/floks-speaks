@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import {
   type Recording,
   type Theme,
@@ -118,30 +119,43 @@ export default function Library({
             {shown.map((r) => (
               <article
                 key={r._id}
-                className="rounded-2xl border border-hairline bg-charcoal p-5"
+                className="overflow-hidden rounded-2xl border border-hairline bg-charcoal"
               >
-                <p className="mb-2 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-lilac">
-                  {r.theme}
-                </p>
-                <h3 className="font-display mb-2.5 text-[1.125rem] font-semibold">
-                  {r.title}
-                </h3>
-                <p className="mb-3.5 text-[0.8125rem] leading-[1.5] text-ivory/66">
-                  {r.description}
-                </p>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    disabled
-                    aria-label={`Play ${r.title}`}
-                    title="Audio arrives in Phase 4"
-                    className="inline-flex min-h-[44px] w-11 items-center justify-center rounded-full border border-edge-dark disabled:opacity-60"
-                  >
-                    <PlayIcon className="h-3 w-2.5 fill-amber" />
-                  </button>
-                  <span className="text-[0.8125rem] text-ivory/66">
-                    {formatDuration(r.durationSec)}
-                  </span>
+                {/* Artwork-led card, per the Build Bible Listen spec. The cover
+                    carries the title, so the heading below is the accessible,
+                    CMS-driven text. */}
+                <Image
+                  src={`/images/${r.coverAsset}`}
+                  alt=""
+                  width={440}
+                  height={440}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="aspect-square w-full border-b border-hairline object-cover"
+                />
+                <div className="p-5">
+                  <p className="mb-2 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-lilac">
+                    {r.theme}
+                  </p>
+                  <h3 className="font-display mb-2.5 text-[1.125rem] font-semibold">
+                    {r.title}
+                  </h3>
+                  <p className="mb-3.5 text-[0.8125rem] leading-[1.5] text-ivory/66">
+                    {r.description}
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      disabled
+                      aria-label={`Play ${r.title}`}
+                      title="Audio arrives in Phase 4"
+                      className="inline-flex min-h-[44px] w-11 items-center justify-center rounded-full border border-edge-dark disabled:opacity-60"
+                    >
+                      <PlayIcon className="h-3 w-2.5 fill-amber" />
+                    </button>
+                    <span className="text-[0.8125rem] text-ivory/66">
+                      {formatDuration(r.durationSec)}
+                    </span>
+                  </div>
                 </div>
               </article>
             ))}
