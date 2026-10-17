@@ -256,7 +256,7 @@ export default async function Home() {
           Four threads running through the work. Each one opens the pieces that
           belong to it.
         </p>
-        <div className="grid max-w-[1040px] gap-6 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {themeNames.map((t) => (
             <Link
               key={t}
@@ -269,7 +269,7 @@ export default async function Home() {
                 src={`/images/${THEME_IMAGES[t]}`}
                 alt=""
                 fill
-                sizes="(max-width: 640px) 100vw, 520px"
+                sizes="(max-width: 640px) 46vw, (max-width: 1024px) 46vw, 25vw"
                 className="theme-card__img"
               />
               )}
