@@ -1,38 +1,95 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { PortableText } from "@portabletext/react";
 import {
   type Article,
-  type ArticleCategory,
-  ARTICLE_CATEGORIES,
   formatDate,
 } from "@/lib/content";
 
 /* ============================================================================
-   JOURNAL
+   JOURNAL — Phase 5
 
    Articles expand in place rather than opening their own route. That is a
    deliberate Phase 2 decision: the Journal has one published article, and a
    dedicated route per article would mean a page whose only content is one
-   essay with no siblings to navigate to. When Sanity lands in Phase 3 and the
-   Journal has a run of articles, the open state here becomes the route and
-   this component keeps the same filter UI.
+   essay with no siblings to navigate to. When the Journal has a run of
+   articles, the open state here becomes the route and this component keeps
+   the same filter UI.
 
-   Two geometry rules earn their comments:
-     auto-fill, not auto-fit. With one article auto-fit collapses the empty
-     tracks and the single card stretches the full 1280px, putting the excerpt
-     at roughly 140 characters a line. auto-fill keeps the empty tracks, so one
-     card is card width.
+   Categories are now derived from the articles themselves (via Sanity),
+   so the component no longer imports a static ARTICLE_CATEGORIES array.
 
-     An open card takes the whole row and caps its body at 68ch, because at
-     full grid width an essay is unreadable.
+   Article body is now Sanity portable text (any[]) rendered with
+   @portabletext/react.
    ========================================================================= */
+
+/** Extract plain text from portable text blocks for search filtering */
+function ptToText(blocks: any[]): string {
+  if (!blocks) return "";
+  return blocks
+    .filter((b) => b._type === "block")
+    .map((b) =>
+      (b.children ?? [])
+        .map((c: any) => c.text ?? "")
+        .join("")
+    )
+    .join(" ");
+}
+
+/** Custom portable text components for the journal article body */
+const ptComponents = {
+  block: {
+    normal: ({ children }: any) => (
+      <p className="mb-[1.1em] text-lede leading-[1.75] text-midnight/82 last:mb-0">
+        {children}
+      </p>
+    ),
+    h2: ({ children }: any) => (
+      <h3 className="font-editorial mt-6 mb-3 text-[1.25rem] leading-[1.3] text-midnight">
+        {children}
+      </h3>
+    ),
+    h3: ({ children }: any) => (
+      <h4 className="font-display mt-5 mb-2 text-[1.0625rem] font-semibold text-midnight">
+        {children}
+      </h4>
+    ),
+    blockquote: ({ children }: any) => (
+      <blockquote className="my-5 border-l-[3px] border-amber-deep pl-5 italic text-midnight/72">
+        {children}
+      </blockquote>
+    ),
+  },
+  marks: {
+    strong: ({ children }: any) => (
+      <strong className="font-semibold text-midnight">{children}</strong>
+    ),
+    em: ({ children }: any) => <em>{children}</em>,
+    link: ({ value, children }: any) => (
+      <a
+        href={value?.href}
+        className="underline decoration-amber-deep/40 underline-offset-2 hover:decoration-amber-deep"
+        target={value?.href?.startsWith("http") ? "_blank" : undefined}
+        rel={value?.href?.startsWith("http") ? "noopener noreferrer" : undefined}
+      >
+        {children}
+      </a>
+    ),
+  },
+};
 
 export default function Journal({ articles }: { articles: Article[] }) {
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<ArticleCategory | "All">("All");
+  const [category, setCategory] = useState<string>("All");
   const [open, setOpen] = useState<string | null>(null);
   const didHash = useRef(false);
+
+  // Derive unique category names from the actual articles
+  const categories = useMemo(() => {
+    const set = new Set(articles.map((a) => a.category).filter(Boolean));
+    return Array.from(set).sort();
+  }, [articles]);
 
   /* Arriving from the About timeline link, /blog#testimony-words-gave-courage,
      must land the reader in the open article, not on a closed card they then
@@ -57,7 +114,7 @@ export default function Journal({ articles }: { articles: Article[] }) {
       const okCat = category === "All" || a.category === category;
       const okText =
         !q ||
-        `${a.title} ${a.excerpt} ${a.category} ${a.body.join(" ")}`
+        `${a.title} ${a.excerpt} ${a.category} ${ptToText(a.body)}`
           .toLowerCase()
           .includes(q);
       return okCat && okText;
@@ -69,7 +126,7 @@ export default function Journal({ articles }: { articles: Article[] }) {
       ? `Showing all ${shown.length} ${articles.length === 1 ? "article" : "articles"}`
       : `Showing ${shown.length} ${shown.length === 1 ? "article" : "articles"}` +
         (category !== "All" ? ` in ${category}` : "") +
-        (query.trim() ? ` matching “${query.trim()}”` : "");
+        (query.trim() ? ` matching "${query.trim()}"` : "");
 
   return (
     <section>
@@ -110,7 +167,7 @@ export default function Journal({ articles }: { articles: Article[] }) {
           aria-label="Filter by category"
           className="flex flex-wrap gap-2.5 border-b border-hairline-ink pb-9"
         >
-          {(["All", ...ARTICLE_CATEGORIES] as const).map((c) => {
+          {["All", ...categories].map((c) => {
             const on = category === c;
             return (
               <button
@@ -176,14 +233,7 @@ export default function Journal({ articles }: { articles: Article[] }) {
                   <div id={`${a.slug}-body`} hidden={!isOpen}>
                     {isOpen && (
                       <div className="mb-6 max-w-[68ch]">
-                        {a.body.map((p, i) => (
-                          <p
-                            key={i}
-                            className="mb-[1.1em] text-lede leading-[1.75] text-midnight/82 last:mb-0"
-                          >
-                            {p}
-                          </p>
-                        ))}
+                        <PortableText value={a.body} components={ptComponents} />
                       </div>
                     )}
                   </div>
@@ -220,7 +270,7 @@ export default function Journal({ articles }: { articles: Article[] }) {
               instead.
             </p>
             <div className="flex flex-wrap justify-center gap-2.5">
-              {ARTICLE_CATEGORIES.map((c) => (
+              {categories.map((c) => (
                 <button
                   key={c}
                   type="button"

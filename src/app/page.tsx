@@ -3,43 +3,38 @@ import Link from "next/link";
 import { PlayIcon } from "@/components/icons";
 import EpisodePlayButton from "@/components/episode-play-button";
 import {
-  RECORDINGS,
-  THEMES,
   THEME_IMAGES,
-  FEATURED_SLUG,
-  recordingBySlug,
   formatDuration,
   formatDate,
 } from "@/lib/content";
+import { getRecordings, getHomepage } from "@/lib/sanity-queries";
+
+export const instant = false;
 import { SHOP_URL } from "@/lib/site";
 
 /* ============================================================================
-   HOME
+   HOME — Phase 5: wired to Sanity CMS
 
-   The hero is ported from the Phase 1 prototype. The numbers in it are not
-   arbitrary and are documented in Design Handoff v31 section 9:
-
-   - the photograph is 2000x1126 (16:9); Felix's core mass is x 63-77%
-   - his raised hand reaches the very top edge and the shirt runs to 96%
-     height, so the frame is tight vertically and the anchor is held high
-     (58% 12%) to let any crop fall off the lower body instead
-   - the left 52% has a mean luminance of 28/255, already dark enough to
-     carry text, so the scrim is light
-   - a stage lamp at ~53% across and ~61% down lands behind the amber line on
-     some window shapes; the local backing on .hero-copy is what fixes it,
-     measured at 3.98:1 worst case
+   Featured track and curated collections come from the Homepage singleton.
+   Recordings come from the audioTrack documents.
    ========================================================================= */
 
-export default function Home() {
-  const featured = recordingBySlug(FEATURED_SLUG)!;
+export default async function Home() {
+  const [recordings, homepage] = await Promise.all([
+    getRecordings(),
+    getHomepage(),
+  ]);
 
-  /* Derived, not a hand-picked list. The prototype hard-coded three slugs,
-     which meant the homepage would quietly go stale every time Floks
-     published. Sorting by publishedAt makes the CMS the only thing that
-     decides what "latest" means. */
-  const latest = [...RECORDINGS]
-    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
-    .slice(0, 3);
+  // Featured track from the homepage singleton, or fall back to first recording
+  const featured = homepage?.featuredTrack ?? recordings[0];
+
+  // Latest three by publish date (recordings already sorted newest-first)
+  const latest = recordings.slice(0, 3);
+
+  // Theme names from the curated collections on the homepage, or fallback to static list
+  const themeNames: string[] =
+    homepage?.curatedCollections?.map((c: { title: string }) => c.title) ??
+    Object.keys(THEME_IMAGES);
 
   return (
     <>
@@ -98,6 +93,7 @@ export default function Home() {
     </section>
 
     {/* 02 FEATURED */}
+    {featured && (
     <section id="listen" className="border-b border-hairline">
       <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-14">
         <p className="mb-6 text-eyebrow font-semibold uppercase tracking-[0.16em] text-ivory/66">
@@ -105,14 +101,16 @@ export default function Home() {
         </p>
         <div className="flex flex-wrap items-center gap-10">
           <div className="min-w-[240px] flex-[0_1_360px]">
+            {featured.coverImageUrl && (
             <Image
-              src={`/images/${featured.coverAsset}`}
+              src={featured.coverImageUrl}
               alt={`${featured.title}, episode artwork`}
               width={720}
               height={720}
               sizes="(max-width: 780px) 100vw, 360px"
               className="w-full rounded-2xl border border-hairline object-cover shadow-[0_12px_32px_rgba(0,0,0,.4)]"
             />
+            )}
           </div>
           <div className="min-w-0 flex-[1_1_420px]">
             <span className="inline-block rounded-full border border-lilac/[0.42] px-3.5 py-[7px] text-[0.6875rem] uppercase tracking-[0.14em] text-lilac">
@@ -122,8 +120,7 @@ export default function Home() {
               {featured.title}
             </h2>
             <p className="mb-6 text-lede leading-[1.7] text-ivory/86">
-              Pidgin, plainly meant. It is Jesus who rules. Two minutes on the
-              authority that sits above every circumstance you are standing in.
+              {featured.description}
             </p>
             <div className="flex flex-wrap items-center gap-5">
               <EpisodePlayButton recording={featured} variant="pill" />
@@ -136,8 +133,10 @@ export default function Home() {
         </div>
       </div>
     </section>
+    )}
 
     {/* 03 LATEST */}
+    {latest.length > 0 && (
     <section className="border-b border-hairline">
       <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-14">
         <div className="mb-9 flex flex-wrap items-baseline justify-between gap-[18px]">
@@ -152,14 +151,16 @@ export default function Home() {
               key={r._id}
               className="rounded-2xl border border-hairline bg-charcoal p-4 shadow-[0_2px_8px_rgba(0,0,0,.28)] transition-colors duration-200 hover:border-amber/55"
             >
+              {r.coverImageUrl && (
               <Image
-                src={`/images/${r.coverAsset}`}
+                src={r.coverImageUrl}
                 alt=""
                 width={640}
                 height={640}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
                 className="mb-4 aspect-square w-full rounded-xl object-cover"
               />
+              )}
               <p className="mb-2 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-lilac">
                 {r.theme}
               </p>
@@ -180,6 +181,7 @@ export default function Home() {
         </div>
       </div>
     </section>
+    )}
 
     {/* 04 MEET THE VOICE */}
     <section
@@ -237,13 +239,14 @@ export default function Home() {
           belong to it.
         </p>
         <div className="grid max-w-[1040px] gap-6 sm:grid-cols-2">
-          {THEMES.map((t) => (
+          {themeNames.map((t) => (
             <Link
               key={t}
               href={`/listen?theme=${t}`}
               aria-label={`Explore ${t} pieces`}
               className="theme-card"
             >
+              {THEME_IMAGES[t] && (
               <Image
                 src={`/images/${THEME_IMAGES[t]}`}
                 alt=""
@@ -251,9 +254,8 @@ export default function Home() {
                 sizes="(max-width: 640px) 100vw, 520px"
                 className="theme-card__img"
               />
+              )}
               <span className="theme-card__scrim" aria-hidden="true" />
-              {/* Live text, not baked into the art, so Phase 3 can drive the
-                  label from the Sanity theme document. */}
               <div className="theme-card__label">
                 <h3 className="theme-card__title">{t}</h3>
               </div>
@@ -263,10 +265,7 @@ export default function Home() {
       </div>
     </section>
 
-    {/* 06 JOURNAL
-        One article is published, so this stays a band pointing at the Journal
-        rather than a three-up grid with two empty slots. Phase 3 swaps it for
-        the three latest once there are three. */}
+    {/* 06 JOURNAL */}
     <section id="journal" className="bg-ivory text-midnight">
       <div className="mx-auto flex w-full max-w-site flex-wrap items-center justify-between gap-[18px] px-(--spacing-gut) py-[clamp(48px,6vw,80px)]">
         <div className="min-w-0 flex-[1_1_420px]">

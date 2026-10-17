@@ -4,18 +4,19 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import {
   type Recording,
-  type Theme,
-  THEMES,
   formatDuration,
 } from "@/lib/content";
 import EpisodePlayButton from "@/components/episode-play-button";
 
 /* ============================================================================
-   LIBRARY
+   LIBRARY — Phase 5
 
    Search and theme filter work together, as in the prototype: the count is a
    live region so a screen reader hears the result change, and the empty state
    offers the themes as a way out rather than leaving a dead end.
+
+   Themes are now derived from the recordings themselves (via Sanity), so the
+   component no longer imports a static THEMES array.
    ========================================================================= */
 
 export default function Library({
@@ -23,10 +24,16 @@ export default function Library({
   initialTheme = "All",
 }: {
   recordings: Recording[];
-  initialTheme?: Theme | "All";
+  initialTheme?: string;
 }) {
+  // Derive unique theme names from the actual recordings
+  const themes = useMemo(() => {
+    const set = new Set(recordings.map((r) => r.theme).filter(Boolean));
+    return Array.from(set).sort();
+  }, [recordings]);
+
   const [query, setQuery] = useState("");
-  const [theme, setTheme] = useState<Theme | "All">(initialTheme);
+  const [theme, setTheme] = useState<string>(initialTheme);
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -44,7 +51,7 @@ export default function Library({
       ? `Showing all ${shown.length} recordings`
       : `Showing ${shown.length} ${shown.length === 1 ? "recording" : "recordings"}` +
         (theme !== "All" ? ` in ${theme}` : "") +
-        (query.trim() ? ` matching “${query.trim()}”` : "");
+        (query.trim() ? ` matching "${query.trim()}"` : "");
 
   return (
     <section>
@@ -89,7 +96,7 @@ export default function Library({
           aria-label="Filter by theme"
           className="flex flex-wrap gap-2.5 border-b border-hairline pb-9"
         >
-          {(["All", ...THEMES] as const).map((t) => {
+          {["All", ...themes].map((t) => {
             const on = theme === t;
             return (
               <button
@@ -121,17 +128,16 @@ export default function Library({
                 key={r._id}
                 className="overflow-hidden rounded-2xl border border-hairline bg-charcoal"
               >
-                {/* Artwork-led card, per the Build Bible Listen spec. The cover
-                    carries the title, so the heading below is the accessible,
-                    CMS-driven text. */}
+                {r.coverImageUrl && (
                 <Image
-                  src={`/images/${r.coverAsset}`}
+                  src={r.coverImageUrl}
                   alt=""
                   width={440}
                   height={440}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   className="aspect-square w-full border-b border-hairline object-cover"
                 />
+                )}
                 <div className="p-5">
                   <p className="mb-2 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-lilac">
                     {r.theme}
@@ -158,7 +164,7 @@ export default function Library({
               Nothing matched that. Try a single word, or browse a theme instead.
             </p>
             <div className="flex flex-wrap justify-center gap-2.5">
-              {THEMES.map((t) => (
+              {themes.map((t) => (
                 <button
                   key={t}
                   type="button"

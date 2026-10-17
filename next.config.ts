@@ -8,6 +8,14 @@ import type { NextConfig } from "next";
 const IS_PRODUCTION = process.env.CONTEXT === "production";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.sanity.io",
+      },
+    ],
+  },
   async headers() {
     if (IS_PRODUCTION) return [];
     return [

@@ -2,17 +2,20 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Image from "next/image";
 import {
-  RECORDINGS,
-  COLLECTIONS,
-  THEMES,
-  type Theme,
-  FEATURED_SLUG,
-  recordingBySlug,
+  type Recording,
   formatDuration,
   formatDate,
 } from "@/lib/content";
+import {
+  getRecordings,
+  getCollections,
+  getThemes,
+  getHomepage,
+} from "@/lib/sanity-queries";
 import EpisodePlayButton from "@/components/episode-play-button";
 import Library from "@/components/library";
+
+export const instant = false;
 
 export const metadata: Metadata = {
   title: "Listen",
@@ -23,35 +26,41 @@ export const metadata: Metadata = {
 /* A theme card on the home page links here as /listen?theme=Faith. Reading the
    query makes this subtree dynamic, so it is isolated here behind Suspense: the
    masthead, featured piece and collections stay static and stream first, while
-   the library arrives already narrowed with no client round trip. Anything that
-   is not one of the four themes falls back to All. */
+   the library arrives already narrowed with no client round trip. */
 async function ThemedLibrary({
   searchParams,
+  recordings,
+  themes,
 }: {
   searchParams: Promise<{ theme?: string }>;
+  recordings: Recording[];
+  themes: string[];
 }) {
   const requested = (await searchParams).theme;
-  const initialTheme: Theme | "All" = (THEMES as string[]).includes(
-    requested ?? "",
-  )
-    ? (requested as Theme)
+  const initialTheme: string = themes.includes(requested ?? "")
+    ? requested!
     : "All";
-  return <Library recordings={RECORDINGS} initialTheme={initialTheme} />;
+  return <Library recordings={recordings} initialTheme={initialTheme} />;
 }
 
-export default function ListenPage({
+export default async function ListenPage({
   searchParams,
 }: {
   searchParams: Promise<{ theme?: string }>;
 }) {
-  const featured = recordingBySlug(FEATURED_SLUG)!;
+  const [recordings, collections, themes, homepage] = await Promise.all([
+    getRecordings(),
+    getCollections(),
+    getThemes(),
+    getHomepage(),
+  ]);
+
+  // Featured from homepage singleton, or first recording
+  const featured = homepage?.featuredTrack ?? recordings[0];
 
   return (
     <>
-      {/* MASTHEAD
-          The hall photograph is 2000x1333 (3:2). It was previously capped at
-          520px, so on a wide screen cover discarded roughly half the frame and
-          the balcony and front rows were lost. Sized to its own ratio now. */}
+      {/* MASTHEAD */}
       <section className="lib-hero relative flex items-end overflow-hidden border-b border-hairline">
         <div className="absolute inset-0">
           <Image
@@ -79,6 +88,7 @@ export default function ListenPage({
       </section>
 
       {/* FEATURED */}
+      {featured && (
       <section className="border-b border-hairline">
         <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-14">
           <p className="mb-6 text-eyebrow font-semibold uppercase tracking-[0.16em] text-ivory/66">
@@ -86,19 +96,18 @@ export default function ListenPage({
           </p>
           <div className="flex flex-wrap gap-8 rounded-2xl border border-hairline bg-charcoal p-5 shadow-[0_12px_32px_rgba(0,0,0,.4)] sm:p-8">
             <div className="min-w-[180px] flex-[0_1_220px]">
+              {featured.coverImageUrl && (
               <Image
-                src={`/images/${featured.coverAsset}`}
+                src={featured.coverImageUrl}
                 alt={`${featured.title}, episode artwork`}
                 width={440}
                 height={440}
                 sizes="(max-width: 640px) 100vw, 220px"
                 className="aspect-square w-full rounded-xl border border-hairline object-cover"
               />
+              )}
             </div>
             <div className="min-w-0 flex-[1_1_380px]">
-              {/* A theme label, not a control. It previously carried
-                  aria-pressed, which made screen readers announce a static
-                  badge as a toggle button (WCAG 4.1.2). */}
               <span className="inline-block rounded-full border border-lilac/[0.42] px-3.5 py-[7px] text-[0.6875rem] uppercase tracking-[0.14em] text-lilac">
                 {featured.theme}
               </span>
@@ -106,8 +115,7 @@ export default function ListenPage({
                 {featured.title}
               </h2>
               <p className="mb-6 text-lede leading-[1.7] text-ivory/86">
-                Pidgin, plainly meant. It is Jesus who rules. Two minutes on the
-                authority that sits above every circumstance you are standing in.
+                {featured.description}
               </p>
               <div className="flex flex-wrap items-center gap-[18px]">
                 <EpisodePlayButton recording={featured} variant="pill" />
@@ -120,11 +128,15 @@ export default function ListenPage({
           </div>
         </div>
       </section>
+      )}
 
-      {/* SEARCH, FILTERS AND THE GRID
-          Client island: everything above this is static and streams first. */}
-      <Suspense fallback={<Library recordings={RECORDINGS} />}>
-        <ThemedLibrary searchParams={searchParams} />
+      {/* SEARCH, FILTERS AND THE GRID */}
+      <Suspense fallback={<Library recordings={recordings} />}>
+        <ThemedLibrary
+          searchParams={searchParams}
+          recordings={recordings}
+          themes={themes}
+        />
       </Suspense>
 
       {/* COLLECTIONS */}
@@ -137,11 +149,8 @@ export default function ListenPage({
             Pieces that belong together, in the order they are meant to be heard.
           </h2>
           <div className="grid gap-6 sm:grid-cols-2">
-            {COLLECTIONS.map((c) => {
-              const covers = c.recordingSlugs
-                .map((s) => recordingBySlug(s))
-                .filter(Boolean)
-                .slice(0, 4);
+            {collections.map((c) => {
+              const covers = (c.recordings ?? []).slice(0, 4);
               return (
                 <article
                   key={c._id}
@@ -154,19 +163,21 @@ export default function ListenPage({
                   {covers.length > 0 && (
                     <div className="mt-4 flex gap-2">
                       {covers.map((r) => (
+                        r.coverImageUrl && (
                         <Image
-                          key={r!._id}
-                          src={`/images/${r!.coverAsset}`}
+                          key={r._id}
+                          src={r.coverImageUrl}
                           alt=""
                           width={72}
                           height={72}
                           className="h-[52px] w-[52px] rounded-lg border border-hairline object-cover"
                         />
+                        )
                       ))}
                     </div>
                   )}
                   <p className="mt-3 text-[0.8125rem] font-semibold uppercase tracking-[0.08em] text-amber">
-                    {c.recordingSlugs.length} recordings
+                    {(c.recordings ?? []).length} recordings
                   </p>
                 </article>
               );

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { ARTICLES } from "@/lib/content";
+import { getArticles } from "@/lib/sanity-queries";
 import Journal from "@/components/journal";
+
+export const instant = false;
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -8,7 +10,9 @@ export const metadata: Metadata = {
     "Writing between the recordings. Notes on craft, faith, and the things that end up becoming poems.",
 };
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const articles = await getArticles();
+
   return (
     <>
       <section className="border-b border-hairline-ink">
@@ -24,11 +28,9 @@ export default function BlogPage() {
         </div>
       </section>
 
-      <Journal articles={ARTICLES} />
+      <Journal articles={articles} />
 
-      {/* NEWSLETTER
-          A dark panel inside an Ivory page. It pins its own surface, and its
-          placeholder keeps the light value rather than the page's ink one. */}
+      {/* NEWSLETTER */}
       <section className="on-dark bg-midnight text-ivory">
         <div className="mx-auto flex w-full max-w-site flex-wrap items-center gap-10 px-(--spacing-gut) py-14">
           <div className="min-w-0 flex-[1_1_360px]">

@@ -41,7 +41,7 @@ export default function EpisodePlayButton({
       title: recording.title,
       subtitle: recording.theme,
       audioUrl: recording.audioUrl,
-      coverUrl: `/images/${recording.coverAsset}`,
+      coverUrl: recording.coverImageUrl ?? "",
       durationSeconds: recording.durationSec,
     });
   };

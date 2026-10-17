@@ -1,224 +1,60 @@
 /* ============================================================================
-   CONTENT
+   CONTENT — Phase 5
 
-   Everything here is placeholder-shaped for Sanity. Each type carries the
-   field names the corresponding Sanity document will arrive with, so Phase 3
-   swaps the arrays for a fetch and nothing downstream changes.
+   Types, helpers, and static data that is shared between server and client
+   components. Sanity fetch functions live in sanity-queries.ts and are only
+   called from server components; they return data shaped to these types.
 
-   Field notes:
-     slug        the Sanity slug.current
-     durationSec integer seconds, formatted at render, never a stored string
-     publishedAt ISO date
-     body        array of paragraphs, maps one to one onto portable text blocks
+   The Recording and Article types now match the Sanity projection shape so
+   no mapping is needed downstream.
+
+   Static data that has NO Sanity schema (journey milestones) stays here.
    ========================================================================= */
 
-export type Theme = "Faith" | "Identity" | "Culture" | "Healing";
-
-export const THEMES: Theme[] = ["Faith", "Identity", "Culture", "Healing"];
-
-/* Card art for the home theme cards. Each file is a finished banner with the
-   theme name set into the image, so the component draws no title of its own.
-   Presentation metadata, kept here so the content layer stays the single
-   source: Phase 3 can move these onto a Sanity "theme" document and nothing in
-   the component changes. Keys match the Theme union above; values are files in
-   /public/images. */
-export const THEME_IMAGES: Record<Theme, string> = {
-  Faith: "theme-faith.webp",
-  Identity: "theme-identity.webp",
-  Culture: "theme-culture.webp",
-  Healing: "theme-healing.webp",
-};
+// ---------------------------------------------------------------------------
+// TYPES
+// ---------------------------------------------------------------------------
 
 export type Recording = {
   _id: string;
   slug: string;
   title: string;
-  theme: Theme;
+  theme: string; // was Theme union; now the collection name from Sanity
   description: string;
   durationSec: number;
   publishedAt: string;
-  coverAsset: string;
-  /** Phase 4 fills this from Cloudflare R2. Null means the player cannot start. */
+  /** Sanity-served cover image URL (via asset→url projection) */
+  coverImageUrl: string | null;
+  /** Phase 4: Cloudflare R2 audio URL. Null means the player cannot start. */
   audioUrl: string | null;
 };
-
-export const RECORDINGS: Recording[] = [
-  {
-    _id: "my-real-gee",
-    slug: "my-real-gee",
-    title: "My Real Gee",
-    theme: "Faith",
-    description: "Jesus as friend and companion through every season.",
-    durationSec: 131,
-    publishedAt: "2026-06-05",
-    coverAsset: "cover-my-real-gee.jpg",
-    audioUrl: null,
-  },
-  {
-    _id: "ebi-jesus",
-    slug: "ebi-jesus",
-    title: "Ebi Jesus Wey Dey Rule",
-    theme: "Faith",
-    description: "Christ's authority above every circumstance.",
-    durationSec: 124,
-    publishedAt: "2026-06-12",
-    coverAsset: "cover-ebi-jesus.jpg",
-    audioUrl: "https://pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev/episodes/s1e7-ebi-jesus-wey-dey-rule.mp3",
-  },
-  {
-    _id: "education",
-    slug: "education",
-    title: "Education",
-    theme: "Culture",
-    description: "Learning as the ground of growth.",
-    durationSec: 112,
-    publishedAt: "2026-06-19",
-    coverAsset: "cover-education.jpg",
-    audioUrl: null,
-  },
-  {
-    _id: "jesus-call",
-    slug: "jesus-call",
-    title: "Jesus' Call",
-    theme: "Faith",
-    description: "The invitation to a transformed life.",
-    durationSec: 138,
-    publishedAt: "2026-06-26",
-    coverAsset: "cover-jesus-call.jpg",
-    audioUrl: null,
-  },
-  {
-    _id: "mekae",
-    slug: "mekae",
-    title: "Mekae (I Remember)",
-    theme: "Identity",
-    description: "The hustle young people endure before breakthrough.",
-    durationSec: 182,
-    publishedAt: "2026-07-03",
-    coverAsset: "cover-mekae.jpg",
-    audioUrl: null,
-  },
-  {
-    _id: "i-wish-i-were",
-    slug: "i-wish-i-were",
-    title: "I Wish I Were",
-    theme: "Identity",
-    description: "Using the gifts you have, however small they seem.",
-    durationSec: 167,
-    publishedAt: "2026-07-10",
-    coverAsset: "cover-i-wish-i-were.jpg",
-    audioUrl: null,
-  },
-  {
-    _id: "master-what-you-do",
-    slug: "master-what-you-do",
-    title: "Master What You Do",
-    theme: "Culture",
-    description: "A call to excellence, refining the craft to serve.",
-    durationSec: 129,
-    publishedAt: "2026-07-17",
-    coverAsset: "cover-master-what-you-do.jpg",
-    audioUrl: null,
-  },
-  {
-    _id: "away-for-a-while",
-    slug: "away-for-a-while",
-    title: "Away For A While",
-    theme: "Healing",
-    description: "Distance as the route to renewal.",
-    durationSec: 153,
-    publishedAt: "2026-07-24",
-    coverAsset: "cover-away-for-a-while.jpg",
-    audioUrl: null,
-  },
-];
-
-/** The piece the Listen page leads with. */
-export const FEATURED_SLUG = "ebi-jesus";
 
 export type Collection = {
   _id: string;
   slug: string;
   title: string;
   description: string;
-  recordingSlugs: string[];
+  coverImageUrl: string | null;
+  recordings: { _id: string; slug: string; coverImageUrl: string | null }[];
 };
 
-export const COLLECTIONS: Collection[] = [
-  {
-    _id: "the-wait",
-    slug: "the-wait",
-    title: "The Wait",
-    description:
-      "The eight pieces that became the first listening launch, in order.",
-    recordingSlugs: RECORDINGS.map((r) => r.slug),
-  },
-];
-
-/* -------------------------------------------------------------------------
-   JOURNAL
-   ------------------------------------------------------------------------- */
-
-export type ArticleCategory =
-  | "Testimonies"
-  | "Craft"
-  | "Faith"
-  | "Culture"
-  | "Behind the piece";
-
-export const ARTICLE_CATEGORIES: ArticleCategory[] = [
-  "Testimonies",
-  "Craft",
-  "Faith",
-  "Culture",
-  "Behind the piece",
-];
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Article = {
   _id: string;
   slug: string;
-  category: ArticleCategory;
+  category: string;
   title: string;
   excerpt: string;
-  /** Pending. A quiet editorial still, a journal, books or a study desk,
-   *  never a photograph of the person described in the testimony. */
-  coverAsset: string | null;
+  coverImageUrl: string | null;
   publishedAt: string;
   readMins: number;
-  body: string[];
+  /** Portable text blocks from Sanity */
+  body: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
-export const ARTICLES: Article[] = [
-  {
-    _id: "testimony-words-gave-courage",
-    slug: "testimony-words-gave-courage",
-    category: "Testimonies",
-    title: "When Words Gave Someone the Courage to Continue",
-    excerpt:
-      "How a spoken-word piece encouraged a young man facing difficulties with his sight to rediscover hope and pursue his education.",
-    coverAsset: null,
-    publishedAt: "2023-06-01",
-    readMins: 4,
-    body: [
-      "Sometimes, God uses the simplest things to make the greatest difference in someone’s life. A conversation, a song, a message, or even a few words spoken at the right moment can restore hope where it has almost disappeared.",
-      "In June 2023, I received a testimony that changed how I saw my spoken-word ministry.",
-      "A young man who was struggling with his sight had become discouraged about his education. The challenges he faced had affected his hope for the future, and he had reached a point where he was ready to give up on his academics.",
-      "Then he encountered some of my spoken-word pieces.",
-      "He later shared how one of those pieces encouraged him to keep going. The words rekindled his hope and gave him the courage to persevere despite his circumstances.",
-      "Today, he is pursuing a Bachelor of Science in Administration at the University of Ghana Business School.",
-      "When I heard his testimony, I was deeply moved. It reminded me that spoken word is more than rhymes, rhythm, or performance. God can use words to reach someone in a difficult season and encourage them to take another step forward.",
-      "That experience challenged me to become more intentional about Floks Speaks. I began to see even more clearly that every piece I create carries an opportunity to speak hope, strengthen faith, and point people towards Christ.",
-      "I may never know every person who listens or every life that is encouraged by a message. But this testimony remains a reminder that the words we speak can travel further than we imagine.",
-      "And if God can use a spoken-word piece to help one person find the courage to continue, then every opportunity to share His message is worth taking.",
-      "This is why I keep speaking. This is why Floks Speaks exists.",
-      "…Jesus Reigns.",
-    ],
-  },
-];
-
-/* -------------------------------------------------------------------------
-   ABOUT: the journey timeline
-   ------------------------------------------------------------------------- */
+// ---------------------------------------------------------------------------
+// STATIC DATA — Journey milestones (no Sanity schema yet)
+// ---------------------------------------------------------------------------
 
 export type Milestone = {
   /** ISO, drives ordering and maps to a CMS date field */
@@ -253,7 +89,7 @@ export const JOURNEY: Milestone[] = [
     heading: "A Testimony That Changed Everything",
     kind: "Testimony",
     major: true,
-    body: "A young man struggling with his sight had given up on his academics until he encountered Felix's spoken-word pieces. One piece rekindled his hope and inspired him to persevere. Today he is pursuing a Bachelor of Science in Administration at the University of Ghana Business School. The testimony revealed the life-changing power of spoken word and challenged Felix to pursue this ministry with greater intentionality.",
+    body: "A young man struggling with his sight had given up on his academics until he encountered Felix’s spoken-word pieces. One piece rekindled his hope and inspired him to persevere. Today he is pursuing a Bachelor of Science in Administration at the University of Ghana Business School. The testimony revealed the life-changing power of spoken word and challenged Felix to pursue this ministry with greater intentionality.",
     link: {
       href: "/blog#testimony-words-gave-courage",
       label: "Read the Full Testimony",
@@ -263,7 +99,7 @@ export const JOURNEY: Milestone[] = [
     date: "2023-10",
     label: "October 2023",
     heading: "Taking the Gospel to Schools",
-    body: "God opened doors to minister across several senior high school campuses in Ghana, particularly in the Western Region. The students' response and admiration for the style created openings to share the gospel, talk with them about Christ, and lead many towards Him.",
+    body: "God opened doors to minister across several senior high school campuses in Ghana, particularly in the Western Region. The students’ response and admiration for the style created openings to share the gospel, talk with them about Christ, and lead many towards Him.",
   },
   {
     date: "2024-01",
@@ -275,7 +111,7 @@ export const JOURNEY: Milestone[] = [
     date: "2025-03",
     label: "March 2025",
     heading: "Wearing the Message",
-    body: "A childhood dream came to life with T-shirts bearing God's Word and proclaiming Christ. Recognising that people are naturally drawn to the messages on what others wear, this became another avenue for evangelism. The “Ebi Jesus Wey Dey Rule” T-shirt became an anthem of faith, worn by individuals and evangelism groups alike. More than clothing, a wearable declaration of Christ, sharing the gospel both consciously and unconsciously.",
+    body: "A childhood dream came to life with T-shirts bearing God’s Word and proclaiming Christ. Recognising that people are naturally drawn to the messages on what others wear, this became another avenue for evangelism. The “Ebi Jesus Wey Dey Rule” T-shirt became an anthem of faith, worn by individuals and evangelism groups alike. More than clothing, a wearable declaration of Christ, sharing the gospel both consciously and unconsciously.",
   },
   {
     date: "2026-05",
@@ -295,9 +131,24 @@ export const JOURNEY: Milestone[] = [
   },
 ];
 
-/* -------------------------------------------------------------------------
-   HELPERS
-   ------------------------------------------------------------------------- */
+// ---------------------------------------------------------------------------
+// THEME IMAGES — kept as fallback / Phase 1 image mapping
+//
+// Theme cards on the home page use baked-in art from /public/images.
+// When CMS collections have their own coverImage, pages should prefer
+// that; these are the fallback for the static banner art.
+// ---------------------------------------------------------------------------
+
+export const THEME_IMAGES: Record<string, string> = {
+  Faith: "theme-faith.webp",
+  Identity: "theme-identity.webp",
+  Culture: "theme-culture.webp",
+  Healing: "theme-healing.webp",
+};
+
+// ---------------------------------------------------------------------------
+// HELPERS — used by both server and client components
+// ---------------------------------------------------------------------------
 
 /** Seconds to m:ss. Durations are stored as integers and formatted here, so a
  *  CMS editor never has to type a time string correctly. */
@@ -327,12 +178,4 @@ export function formatDate(iso: string): string {
     year: "numeric",
     timeZone: "UTC",
   });
-}
-
-export function recordingBySlug(slug: string) {
-  return RECORDINGS.find((r) => r.slug === slug);
-}
-
-export function articleBySlug(slug: string) {
-  return ARTICLES.find((a) => a.slug === slug);
 }
