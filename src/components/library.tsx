@@ -8,7 +8,7 @@ import {
   THEMES,
   formatDuration,
 } from "@/lib/content";
-import { PlayIcon } from "@/components/icons";
+import EpisodePlayButton from "@/components/episode-play-button";
 
 /* ============================================================================
    LIBRARY
@@ -143,13 +143,7 @@ export default function Library({
                     {r.description}
                   </p>
                   <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      aria-label={`Play ${r.title}`}
-                      className="inline-flex min-h-[44px] w-11 items-center justify-center rounded-full border border-amber/50 transition-colors duration-200 hover:bg-amber/[0.16]"
-                    >
-                      <PlayIcon className="h-3 w-2.5 fill-amber" />
-                    </button>
+                    <EpisodePlayButton recording={r} variant="icon" />
                     <span className="text-[0.8125rem] text-ivory/66">
                       {formatDuration(r.durationSec)}
                     </span>

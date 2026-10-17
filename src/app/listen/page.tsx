@@ -11,7 +11,7 @@ import {
   formatDuration,
   formatDate,
 } from "@/lib/content";
-import { PlayIcon } from "@/components/icons";
+import EpisodePlayButton from "@/components/episode-play-button";
 import Library from "@/components/library";
 
 export const metadata: Metadata = {
@@ -110,13 +110,7 @@ export default function ListenPage({
                 authority that sits above every circumstance you are standing in.
               </p>
               <div className="flex flex-wrap items-center gap-[18px]">
-                <button
-                  type="button"
-                  className="inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full bg-amber px-[30px] text-[0.9375rem] font-semibold text-midnight transition-[background,transform] duration-200 hover:-translate-y-0.5 hover:bg-[#F7BD6E]"
-                >
-                  <PlayIcon className="h-[15px] w-[13px] fill-midnight" />
-                  Play
-                </button>
+                <EpisodePlayButton recording={featured} variant="pill" />
                 <span className="text-[0.8125rem] text-ivory/66">
                   {formatDuration(featured.durationSec)} &middot;{" "}
                   {formatDate(featured.publishedAt)}

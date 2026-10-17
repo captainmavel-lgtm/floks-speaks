@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PlayIcon } from "@/components/icons";
+import EpisodePlayButton from "@/components/episode-play-button";
 import {
   RECORDINGS,
   THEMES,
@@ -125,13 +126,7 @@ export default function Home() {
               authority that sits above every circumstance you are standing in.
             </p>
             <div className="flex flex-wrap items-center gap-5">
-              <button
-                type="button"
-                className="inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full bg-amber px-[30px] text-[0.9375rem] font-semibold text-midnight transition-[background,transform] duration-200 hover:-translate-y-0.5 hover:bg-[#F7BD6E]"
-              >
-                <PlayIcon className="h-[15px] w-[13px] fill-midnight" />
-                Play
-              </button>
+              <EpisodePlayButton recording={featured} variant="pill" />
               <span className="text-[0.8125rem] text-ivory/66">
                 {formatDuration(featured.durationSec)} &middot;{" "}
                 {formatDate(featured.publishedAt)}
@@ -174,13 +169,7 @@ export default function Home() {
                 </Link>
               </h3>
               <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  aria-label={`Play ${r.title}`}
-                  className="inline-flex min-h-[44px] w-11 items-center justify-center rounded-full border border-amber/50 transition-colors duration-200 hover:bg-amber/[0.16]"
-                >
-                  <PlayIcon className="h-3 w-2.5 fill-amber" />
-                </button>
+                <EpisodePlayButton recording={r} variant="icon" />
                 <span className="text-[0.8125rem] text-ivory/66">
                   {formatDuration(r.durationSec)} &middot;{" "}
                   {formatDate(r.publishedAt)}

@@ -63,7 +63,7 @@ export const RECORDINGS: Recording[] = [
     durationSec: 124,
     publishedAt: "2026-06-12",
     coverAsset: "cover-ebi-jesus.jpg",
-    audioUrl: null,
+    audioUrl: "https://pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev/episodes/s1e7-ebi-jesus-wey-dey-rule.mp3",
   },
   {
     _id: "education",
