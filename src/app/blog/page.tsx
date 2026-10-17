@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getArticles } from "@/lib/sanity-queries";
 import Journal from "@/components/journal";
+import NewsletterForm from "@/components/newsletter-form";
 
 export const instant = false;
 
@@ -40,42 +41,9 @@ export default async function BlogPage() {
               goes to nobody.
             </p>
           </div>
-          <NewsletterForm />
+          <NewsletterForm inputId="nl" />
         </div>
       </section>
     </>
-  );
-}
-
-function NewsletterForm() {
-  return (
-    <form className="min-w-0 flex-[1_1_380px]">
-      <label
-        htmlFor="nl"
-        className="mb-3 block text-[0.8125rem] uppercase tracking-[0.08em] text-ivory/60"
-      >
-        Email address
-      </label>
-      <div className="flex flex-wrap gap-3">
-        <input
-          id="nl"
-          type="email"
-          required
-          placeholder="you@example.com"
-          className="min-h-[52px] min-w-0 flex-[1_1_220px] rounded-full border border-edge-dark bg-[#1a1b21] px-5 text-ivory placeholder:text-placeholder-dark"
-        />
-        <button
-          type="submit"
-          disabled
-          title="Connected in Phase 6"
-          className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-amber px-[30px] text-[0.9375rem] font-semibold text-midnight disabled:opacity-60"
-        >
-          Subscribe
-        </button>
-      </div>
-      <p className="mt-3.5 text-[0.8125rem] leading-[1.6] text-ivory/66">
-        Double opt-in. You confirm by email first. Unsubscribe any time.
-      </p>
-    </form>
   );
 }

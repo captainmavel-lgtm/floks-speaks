@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { PlayIcon } from "@/components/icons";
 import EpisodePlayButton from "@/components/episode-play-button";
+import NewsletterForm from "@/components/newsletter-form";
 import {
   THEME_IMAGES,
   formatDuration,
@@ -438,35 +439,7 @@ export default async function Home() {
             goes to nobody.
           </p>
         </div>
-        <form className="min-w-0 flex-[1_1_400px]">
-          <label
-            htmlFor="em"
-            className="mb-3 block text-[0.8125rem] uppercase tracking-[0.08em] text-ivory/60"
-          >
-            Email address
-          </label>
-          <div className="flex flex-wrap gap-3">
-            <input
-              id="em"
-              type="email"
-              required
-              placeholder="you@example.com"
-              className="min-h-[52px] min-w-0 flex-[1_1_220px] rounded-full border border-edge-dark bg-[#1a1b21] px-5 text-ivory placeholder:text-placeholder-dark"
-            />
-            <button
-              type="submit"
-              disabled
-              title="Connected in Phase 6"
-              className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-amber px-[30px] text-[0.9375rem] font-semibold text-midnight disabled:opacity-60"
-            >
-              Subscribe
-            </button>
-          </div>
-          <p className="mt-3.5 text-[0.8125rem] leading-[1.6] text-ivory/66">
-            Double opt-in. You will get a confirmation email first. Unsubscribe
-            any time.
-          </p>
-        </form>
+        <NewsletterForm inputId="em" />
       </div>
     </section>
     </>
