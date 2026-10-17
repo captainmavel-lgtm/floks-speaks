@@ -5,6 +5,8 @@ import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import PlatformStrip from "@/components/platform-strip";
 import PlayerSlot from "@/components/player-slot";
+import AudioPlayer from "@/components/audio-player";
+import { AudioPlayerProvider } from "@/context/audio-player";
 
 /* Fonts are self-hosted from the repo rather than fetched from Google at build
    time. Three reasons, in order of weight:
@@ -73,11 +75,14 @@ export default function RootLayout({
     >
       {/* data-theme is set per page by the route segment; dark is the default */}
       <body data-theme="dark">
-        <SiteHeader />
-        <main id="top">{children}</main>
-        <PlatformStrip />
-        <SiteFooter />
-        <PlayerSlot />
+        <AudioPlayerProvider>
+          <SiteHeader />
+          <main id="top">{children}</main>
+          <PlatformStrip />
+          <SiteFooter />
+          <PlayerSlot />
+          <AudioPlayer />
+        </AudioPlayerProvider>
       </body>
     </html>
   );
