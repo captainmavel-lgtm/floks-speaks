@@ -5,4 +5,5 @@ export default defineCliConfig({
     projectId: "0j0cu34s",
     dataset: "production",
   },
+  studioHost: "floks-speaks",
 });
