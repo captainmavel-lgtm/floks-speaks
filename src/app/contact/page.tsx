@@ -5,7 +5,7 @@ import SocialList from "@/components/social-list";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Bookings, collaborations, press, or a thought on something you heard. Every enquiry gets an answer.",
+    "Bookings, collaborations, press, or a thought on something you heard. Share your enquiry and we'll get back to you as soon as possible.",
 };
 
 export default function ContactPage() {
@@ -37,7 +37,7 @@ export default function ContactPage() {
             </svg>
             <div>
               <p className="m-0 mb-1 font-semibold">
-                Every enquiry gets an answer.
+                Share your enquiry and we&apos;ll get back to you as soon as possible.
               </p>
               <p className="m-0 text-[0.9375rem] leading-[1.6] text-midnight/68">
                 Including the ones that turn into a no. Bookings move fastest

@@ -50,6 +50,12 @@ export type Article = {
   readMins: number;
   /** Portable text blocks from Sanity */
   body: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
+  /** Author name — defaults to "Floks Speaks" */
+  author?: string;
+  /** Short bio for guest contributors */
+  authorBio?: string;
+  /** Headshot URL for guest contributors */
+  authorPhotoUrl?: string | null;
 };
 
 // ---------------------------------------------------------------------------

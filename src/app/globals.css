@@ -708,3 +708,26 @@ a[class*="btn"] {
     flex: 1 1 100%;
   }
 }
+
+/* ============================================================================
+   SHARE BUTTONS — Phase 6
+   Uniform pill-shaped buttons for social sharing on blog articles.
+   ========================================================================= */
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding-inline: 18px;
+  border-radius: 9999px;
+  border: 1px solid var(--color-edge-ink, rgba(17, 17, 22, 0.16));
+  color: var(--color-midnight, #111116);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+.share-btn:hover {
+  border-color: var(--color-midnight, #111116);
+  background: rgba(17, 17, 22, 0.04);
+}

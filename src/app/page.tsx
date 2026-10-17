@@ -7,7 +7,7 @@ import {
   formatDuration,
   formatDate,
 } from "@/lib/content";
-import { getRecordings, getHomepage } from "@/lib/sanity-queries";
+import { getRecordings, getHomepage, getArticles } from "@/lib/sanity-queries";
 
 export const instant = false;
 import { SHOP_URL } from "@/lib/site";
@@ -20,9 +20,10 @@ import { SHOP_URL } from "@/lib/site";
    ========================================================================= */
 
 export default async function Home() {
-  const [recordings, homepage] = await Promise.all([
+  const [recordings, homepage, articles] = await Promise.all([
     getRecordings(),
     getHomepage(),
+    getArticles(),
   ]);
 
   // Featured track from the homepage singleton, or fall back to first recording
@@ -230,7 +231,23 @@ export default async function Home() {
       </div>
     </section>
 
-    {/* 05 THEMES */}
+    {/* 05 SCRIPTURE */}
+    <section className="border-b border-hairline bg-charcoal">
+      <div className="mx-auto w-full max-w-[56ch] px-(--spacing-gut) py-[clamp(56px,8vw,96px)] text-center">
+        <blockquote className="font-editorial text-[clamp(1.25rem,2.4vw,1.65rem)] italic leading-[1.55] text-ivory/90">
+          &ldquo;Therefore God also has highly exalted Him and given Him the
+          name which is above every name, that at the name of Jesus every knee
+          should bow, of those in heaven, and of those on earth, and of those
+          under the earth, and that every tongue should confess that Jesus
+          Christ is Lord, to the glory of God the Father.&rdquo;
+        </blockquote>
+        <cite className="font-ui mt-5 block text-[0.8125rem] uppercase not-italic tracking-[0.12em] text-amber">
+          Philippians 2:9&ndash;11, NKJV
+        </cite>
+      </div>
+    </section>
+
+    {/* 06 THEMES */}
     <section className="border-b border-hairline">
       <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-14">
         <h2 className="font-display text-h2 font-semibold">Explore by theme</h2>
@@ -265,27 +282,58 @@ export default async function Home() {
       </div>
     </section>
 
-    {/* 06 JOURNAL */}
-    <section id="journal" className="bg-ivory text-midnight">
-      <div className="mx-auto flex w-full max-w-site flex-wrap items-center justify-between gap-[18px] px-(--spacing-gut) py-[clamp(48px,6vw,80px)]">
-        <div className="min-w-0 flex-[1_1_420px]">
-          <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber-ink">
-            From the journal
-          </p>
-          <h2 className="font-editorial mb-3 text-h2-ed">
-            The first piece is being written.
-          </h2>
-          <p className="m-0 max-w-[54ch] text-[1.0625rem] text-midnight/70">
-            Notes on craft, faith, and the things that end up becoming poems.
-            Subscribe below and the first one comes to you.
-          </p>
+    {/* 06 BLOG */}
+    <section id="blog" className="bg-ivory text-midnight">
+      <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-[clamp(48px,6vw,80px)]">
+        <div className="mb-8 flex flex-wrap items-baseline justify-between gap-[18px]">
+          <div className="min-w-0 flex-[1_1_420px]">
+            <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber-ink">
+              From the blog
+            </p>
+            <h2 className="font-editorial mb-3 text-h2-ed">
+              Writing between the recordings.
+            </h2>
+            <p className="m-0 max-w-[54ch] text-[1.0625rem] text-midnight/70">
+              Notes on craft, faith, and the things that end up becoming poems.
+            </p>
+          </div>
+          <Link
+            href="/blog"
+            className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-edge-ink px-[30px] text-[0.9375rem] font-semibold text-midnight no-underline transition-colors duration-200 hover:border-midnight"
+          >
+            Visit the blog
+          </Link>
         </div>
-        <Link
-          href="/blog"
-          className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-edge-ink px-[30px] text-[0.9375rem] font-semibold text-midnight no-underline transition-colors duration-200 hover:border-midnight"
-        >
-          Visit the journal
-        </Link>
+
+        {articles.length > 0 ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {articles.slice(0, 3).map((a) => (
+              <article
+                key={a._id}
+                className="rounded-2xl border border-hairline-ink bg-white/45 p-6 transition-colors duration-200 hover:border-amber-deep/40"
+              >
+                <span className="rounded-full border border-lilac-deep px-3 py-[6px] text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-lilac-ink">
+                  {a.category}
+                </span>
+                <h3 className="font-editorial mt-4 mb-3 text-[1.25rem] leading-[1.22]">
+                  <Link href={`/blog/${a.slug}`} className="text-midnight no-underline">
+                    {a.title}
+                  </Link>
+                </h3>
+                <p className="mb-4 text-[0.9375rem] leading-[1.65] text-midnight/70">
+                  {a.excerpt}
+                </p>
+                <span className="text-[0.8125rem] text-midnight/55">
+                  {formatDate(a.publishedAt)} &middot; {a.readMins} min read
+                </span>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="m-0 text-[1.0625rem] text-midnight/60">
+            The first piece is being written. Subscribe below and it comes to you.
+          </p>
+        )}
       </div>
     </section>
 

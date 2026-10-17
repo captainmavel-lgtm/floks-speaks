@@ -136,7 +136,7 @@ export default function Journal({ articles }: { articles: Article[] }) {
             htmlFor="jq"
             className="mb-3 block text-[0.75rem] uppercase tracking-[0.08em] text-midnight/60"
           >
-            Search the journal
+            Search the blog
           </label>
           <div className="relative max-w-[540px]">
             <svg

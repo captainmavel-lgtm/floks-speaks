@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import DraftNotice from "@/components/draft-notice";
+
 
 export const metadata: Metadata = {
   title: "Terms",
@@ -22,12 +22,6 @@ export default function TermsPage() {
           <p className="mb-8 text-[0.875rem] text-midnight/60">
             Last updated {UPDATED}
           </p>
-
-          <DraftNotice>
-            <strong>Draft for review.</strong> Felix should read this and
-            confirm it matches what he intends, particularly the section on
-            using the recordings. It has not been checked by a lawyer.
-          </DraftNotice>
 
           <h2>Who this is</h2>
           <p>

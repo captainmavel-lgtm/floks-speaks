@@ -18,7 +18,7 @@ import { useRef, useState } from "react";
    that sending is not connected yet, rather than pretending to succeed.
    ========================================================================= */
 
-const ENDPOINT = process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT ?? "";
+const ENDPOINT = "https://formspree.io/f/xwlvyqbj";
 
 const ENQUIRY_TYPES = ["Booking", "Collaboration", "Media / Press", "General"];
 

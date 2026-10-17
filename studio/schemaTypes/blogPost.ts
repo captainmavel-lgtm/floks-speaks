@@ -3,7 +3,7 @@ import { defineField, defineType } from "sanity";
 /** Blog Post — Build Bible Section 09. */
 export const blogPost = defineType({
   name: "blogPost",
-  title: "Journal Article",
+  title: "Blog Post",
   type: "document",
   groups: [
     { name: "basics", title: "Basics", default: true },
@@ -58,6 +58,23 @@ export const blogPost = defineType({
       group: "basics",
       initialValue: "Floks Speaks",
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "authorBio",
+      title: "Author bio",
+      type: "text",
+      rows: 2,
+      group: "basics",
+      description:
+        "One or two sentences about the author. Used on full article pages for guest contributors.",
+    }),
+    defineField({
+      name: "authorPhoto",
+      title: "Author photo",
+      type: "image",
+      group: "basics",
+      options: { hotspot: true },
+      description: "Headshot of the author. Used on full article pages.",
     }),
     defineField({
       name: "relatedAudio",

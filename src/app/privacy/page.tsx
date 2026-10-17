@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import DraftNotice from "@/components/draft-notice";
+
 
 export const metadata: Metadata = {
   title: "Privacy",
@@ -26,13 +26,6 @@ export default function PrivacyPage() {
           <p className="mb-8 text-[0.875rem] text-midnight/60">
             Last updated {UPDATED}
           </p>
-
-          <DraftNotice>
-            <strong>Draft for review.</strong> This describes how the site is
-            built to work. Before launch it needs checking against the services
-            actually connected, and against the data protection law that applies
-            in Ghana, Canada and the EU.
-          </DraftNotice>
 
           <h2>The short version</h2>
           <p>

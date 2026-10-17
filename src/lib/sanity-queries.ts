@@ -55,7 +55,10 @@ const ARTICLE_PROJECTION = `{
   "coverImage": featuredImage,
   publishedAt,
   "readMins": round(length(pt::text(body)) / 1000),
-  body
+  body,
+  author,
+  authorBio,
+  "authorPhotoUrl": authorPhoto.asset->url
 }`;
 
 // ---------------------------------------------------------------------------

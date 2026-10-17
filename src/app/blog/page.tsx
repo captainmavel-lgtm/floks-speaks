@@ -18,7 +18,7 @@ export default async function BlogPage() {
       <section className="border-b border-hairline-ink">
         <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-16">
           <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber-ink">
-            The Journal
+            Blog
           </p>
           <h1 className="font-editorial text-h1">Writing between the recordings.</h1>
           <p className="mt-5 max-w-[52ch] text-lede leading-[1.7] text-midnight/78">
