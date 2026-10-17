@@ -1,4 +1,5 @@
 import { defineField, defineType } from "sanity";
+import { AudioUploadInput } from "../components/AudioUploadInput";
 
 /**
  * Audio Track — Build Bible Section 09.
@@ -77,11 +78,14 @@ export const audioTrack = defineType({
     // --- Audio ---
     defineField({
       name: "audioUrl",
-      title: "Audio file URL",
+      title: "Audio file",
       type: "url",
       group: "audio",
       description:
-        "Populated automatically by the R2 upload integration (Phase 4). Do not paste a URL here by hand.",
+        "Upload an MP3 file. It will be stored on Cloudflare R2 and the URL, duration, and file size will be filled in automatically.",
+      components: {
+        input: AudioUploadInput,
+      },
       validation: (Rule) => Rule.required(),
     }),
     defineField({

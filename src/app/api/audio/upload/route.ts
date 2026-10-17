@@ -28,6 +28,29 @@ import { NextRequest, NextResponse } from "next/server";
 
 const MAX_BYTES = 200 * 1024 * 1024; // 200 MB
 
+// ── CORS — allow Sanity Studio to call this endpoint ────────────────────────
+const ALLOWED_ORIGINS = [
+  "https://floks-speaks.sanity.studio",
+  "http://localhost:3333", // local Sanity dev
+  "http://localhost:3000", // local Next.js dev
+];
+
+function corsHeaders(req: NextRequest): HeadersInit {
+  const origin = req.headers.get("origin") ?? "";
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : "";
+  return {
+    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, x-upload-secret",
+    "Access-Control-Max-Age": "86400",
+  };
+}
+
+/** Preflight handler for CORS */
+export function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: corsHeaders(req) });
+}
+
 const r2 = new S3Client({
   region: "auto",
   endpoint: process.env.CLOUDFLARE_R2_ENDPOINT!,
@@ -38,10 +61,12 @@ const r2 = new S3Client({
 });
 
 export async function POST(req: NextRequest) {
+  const cors = corsHeaders(req);
+
   // ── Auth ──────────────────────────────────────────────────────────────────
   const secret = req.headers.get("x-upload-secret");
   if (!secret || secret !== process.env.AUDIO_UPLOAD_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: cors });
   }
 
   // ── Parse form ────────────────────────────────────────────────────────────
@@ -49,19 +74,19 @@ export async function POST(req: NextRequest) {
   try {
     formData = await req.formData();
   } catch {
-    return NextResponse.json({ error: "Invalid form data" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid form data" }, { status: 400, headers: cors });
   }
 
   const file = formData.get("file") as File | null;
   const slug = formData.get("slug") as string | null;
 
   if (!file) {
-    return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    return NextResponse.json({ error: "No file provided" }, { status: 400, headers: cors });
   }
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
     return NextResponse.json(
       { error: "slug is required and must be lowercase letters, numbers and hyphens only" },
-      { status: 400 }
+      { status: 400, headers: cors }
     );
   }
 
@@ -69,7 +94,7 @@ export async function POST(req: NextRequest) {
   if (!["audio/mpeg", "audio/mp3"].includes(file.type)) {
     return NextResponse.json(
       { error: "Only MP3 files are accepted (audio/mpeg)" },
-      { status: 415 }
+      { status: 415, headers: cors }
     );
   }
 
@@ -77,13 +102,35 @@ export async function POST(req: NextRequest) {
   if (file.size > MAX_BYTES) {
     return NextResponse.json(
       { error: `File too large. Maximum is ${MAX_BYTES / 1024 / 1024} MB` },
-      { status: 413 }
+      { status: 413, headers: cors }
     );
   }
 
   // ── Upload to R2 ──────────────────────────────────────────────────────────
   const key = `episodes/${slug}.mp3`;
   const bucket = process.env.CLOUDFLARE_R2_BUCKET_NAME!;
+
+  // Refuse to overwrite an existing episode's audio unless the caller said so
+  // explicitly. Podcast apps and the website already point at these files, so
+  // a silent overwrite from a mistyped slug would swap one episode's audio for
+  // another's.
+  const allowReplace = formData.get("allowReplace") === "true";
+  if (!allowReplace) {
+    try {
+      await r2.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
+      // HeadObject succeeded, so the object is already there.
+      return NextResponse.json(
+        {
+          error: `An audio file already exists for the slug "${slug}". Confirm the replacement to overwrite it.`,
+          exists: true,
+          key,
+        },
+        { status: 409, headers: cors }
+      );
+    } catch {
+      // Not found (or not reachable) — fall through and upload.
+    }
+  }
 
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -103,7 +150,7 @@ export async function POST(req: NextRequest) {
     console.error("[audio/upload] R2 upload failed:", err);
     return NextResponse.json(
       { error: "Upload to storage failed. Check server logs." },
-      { status: 502 }
+      { status: 502, headers: cors }
     );
   }
 
@@ -122,7 +169,7 @@ export async function POST(req: NextRequest) {
       size: file.size,
       slug,
     },
-    { status: 201 }
+    { status: 201, headers: cors }
   );
 }
 

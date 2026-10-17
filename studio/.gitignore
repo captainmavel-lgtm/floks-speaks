@@ -4,3 +4,6 @@ dist/
 *.log
 .env
 .env.local
+
+# ...but the template is tracked (overrides the root `.env*` rule)
+!.env.example
