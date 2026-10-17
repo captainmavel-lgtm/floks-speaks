@@ -13,8 +13,8 @@ import { createClient } from "@sanity/client";
 import { createImageUrlBuilder } from "@sanity/image-url";
 import type { SanityImageSource } from "@sanity/image-url";
 
-export const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!;
-export const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET!;
+export const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? "0j0cu34s";
+export const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production";
 
 export const client = createClient({
   projectId,
