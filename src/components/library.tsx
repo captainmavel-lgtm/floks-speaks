@@ -157,7 +157,10 @@ export default function Library({
                     {r.description}
                   </p>
                   <div className="flex items-center gap-3">
-                    <EpisodePlayButton recording={r} variant="icon" />
+                    {/* The queue is what the reader can see: the current
+                        filter and search result, in displayed order. Narrow
+                        to Healing and "next" stays inside Healing. */}
+                    <EpisodePlayButton recording={r} variant="icon" queue={shown} />
                     <span className="text-[0.8125rem] text-ivory/66">
                       {formatDuration(r.durationSec)}
                     </span>

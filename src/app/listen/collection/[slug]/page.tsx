@@ -125,7 +125,7 @@ export default async function CollectionPage({
                       {i + 1}
                     </span>
                   )}
-                  <EpisodePlayButton recording={r} variant="icon" />
+                  <EpisodePlayButton recording={r} variant="icon" queue={tracks} />
                   {r.coverImageUrl && (
                     <Image
                       src={r.coverImageUrl}

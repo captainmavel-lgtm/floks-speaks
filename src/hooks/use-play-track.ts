@@ -27,13 +27,13 @@ export function usePlayTrack(trackId?: string) {
   const isThisPaused = isThisTrack && status === "paused";
 
   const playTrack = useCallback(
-    (t: Track) => {
+    (t: Track, queue?: Track[]) => {
       if (isThisPlaying) {
         pause();
       } else if (isThisPaused) {
         resume();
       } else {
-        play(t);
+        play(t, queue);
       }
     },
     [isThisPlaying, isThisPaused, play, pause, resume]

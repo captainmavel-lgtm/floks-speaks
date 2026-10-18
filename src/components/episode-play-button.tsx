@@ -24,10 +24,18 @@ export default function EpisodePlayButton({
   recording,
   variant = "icon",
   label = "Play",
+  queue,
 }: {
   recording: Recording;
   variant?: Variant;
   label?: string;
+  /**
+   * The list this recording is being played from, in the order shown on
+   * screen — the album's running order, or the library as currently
+   * filtered. Playback advances through it. Omit for a one-off play (the
+   * featured track, say), and the piece plays alone and stops.
+   */
+  queue?: Recording[];
 }) {
   const { playTrack, isThisPlaying, isThisLoading, isThisPaused } =
     usePlayTrack(recording._id);
@@ -36,14 +44,20 @@ export default function EpisodePlayButton({
 
   const onClick = () => {
     if (!recording.audioUrl) return;
-    playTrack({
-      id: recording._id,
-      title: recording.title,
-      subtitle: recording.theme,
-      audioUrl: recording.audioUrl,
-      coverUrl: recording.coverImageUrl ?? "",
-      durationSeconds: recording.durationSec,
+    /* Recordings without audio are dropped from the queue rather than left in
+       to fail — a silent stall mid-album is worse than a shorter list. */
+    const asTrack = (r: Recording) => ({
+      id: r._id,
+      title: r.title,
+      subtitle: r.theme,
+      audioUrl: r.audioUrl as string,
+      coverUrl: r.coverImageUrl ?? "",
+      durationSeconds: r.durationSec,
     });
+    playTrack(
+      asTrack(recording),
+      queue?.filter((r) => r.audioUrl).map(asTrack),
+    );
   };
 
   const stateLabel = isThisLoading

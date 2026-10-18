@@ -181,7 +181,9 @@ export default async function Home() {
                 </Link>
               </h3>
               <div className="flex items-center gap-3">
-                <EpisodePlayButton recording={r} variant="icon" />
+                {/* The three latest, in the order shown. The featured pill
+                    above stays a one-off: it is a highlight, not a list. */}
+                <EpisodePlayButton recording={r} variant="icon" queue={latest} />
                 <span className="text-[0.8125rem] text-ivory/66">
                   {formatDuration(r.durationSec)} &middot;{" "}
                   {formatDate(r.publishedAt)}

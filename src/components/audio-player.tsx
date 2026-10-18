@@ -73,6 +73,22 @@ function SkipBack15({ size = 18 }: { size?: number }) {
   );
 }
 
+function PrevTrack({ size = 17 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M7 6h2v12H7zm3.5 6L19 18V6z" />
+    </svg>
+  );
+}
+
+function NextTrack({ size = 17 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M15 6h2v12h-2zM5 18l8.5-6L5 6z" />
+    </svg>
+  );
+}
+
 function SkipForward15({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -190,8 +206,25 @@ function Scrubber({
 // ── Main Player ───────────────────────────────────────────────────────────────
 
 function PlayerBar() {
-  const { track, status, currentTime, duration, volume, muted, play, pause, resume, seek, setVolume, toggleMute, skip } =
-    useAudioPlayer();
+  const {
+    track,
+    status,
+    currentTime,
+    duration,
+    volume,
+    muted,
+    play,
+    pause,
+    resume,
+    seek,
+    setVolume,
+    toggleMute,
+    skip,
+    next,
+    previous,
+    hasNext,
+    hasPrevious,
+  } = useAudioPlayer();
 
   const [dismissed, setDismissed] = useState(false);
 
@@ -258,6 +291,17 @@ function PlayerBar() {
 
         {/* Controls */}
         <div className="flex items-center gap-1 flex-shrink-0">
+          {/* Previous track. Always enabled: past 3s it restarts the current
+              piece, which is the behaviour listeners expect even on track 1. */}
+          <button
+            onClick={previous}
+            aria-label={hasPrevious ? "Previous recording" : "Restart recording"}
+            className="hidden sm:flex p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
+            style={{ color: "rgba(242,237,229,0.7)", "--tw-ring-color": "var(--color-amber)" } as React.CSSProperties}
+          >
+            <PrevTrack />
+          </button>
+
           {/* Skip back 15s */}
           <button
             onClick={() => skip(-15)}
@@ -291,6 +335,18 @@ function PlayerBar() {
             style={{ color: "rgba(242,237,229,0.7)", "--tw-ring-color": "var(--color-amber)" } as React.CSSProperties}
           >
             <SkipForward15 />
+          </button>
+
+          {/* Next track. Disabled rather than hidden at the end of a queue, so
+              the control row keeps its shape instead of reflowing. */}
+          <button
+            onClick={next}
+            disabled={!hasNext}
+            aria-label="Next recording"
+            className="p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            style={{ color: "rgba(242,237,229,0.7)", "--tw-ring-color": "var(--color-amber)" } as React.CSSProperties}
+          >
+            <NextTrack />
           </button>
 
           {/* Volume — hidden on small screens */}
