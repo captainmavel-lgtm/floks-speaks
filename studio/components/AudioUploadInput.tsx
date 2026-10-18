@@ -123,15 +123,44 @@ export function AudioUploadInput(props: StringInputProps) {
   const missingConfig = !UPLOAD_URL || !UPLOAD_SECRET;
   const busy = phase === "reading" || phase === "uploading" || phase === "saving";
 
-  /** Send the file to the upload route. Resolves with the public CDN URL. */
-  const postFile = useCallback(
-    (file: File, fileSlug: string, allowReplace: boolean) =>
-      new Promise<string>((resolve, reject) => {
+  /**
+   * Exchange the slug for a presigned URL.
+   *
+   * The file itself never passes through the site. Netlify's functions cap
+   * request bodies at around 6 MB — far below any real episode — so this call
+   * carries only a little JSON, and the audio goes to R2 directly.
+   */
+  const requestPresign = useCallback(
+    async (file: File, fileSlug: string, allowReplace: boolean) => {
+      const res = await fetch(`${UPLOAD_URL}/api/audio/upload`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-upload-secret": UPLOAD_SECRET,
+        },
+        body: JSON.stringify({ slug: fileSlug, size: file.size, allowReplace }),
+      });
+
+      const data = await res.json().catch(() => ({}) as Record<string, unknown>);
+
+      if (!res.ok) {
+        const err = new Error(
+          (data.error as string) || `Could not prepare the upload (HTTP ${res.status})`
+        ) as Error & { alreadyExists?: boolean };
+        err.alreadyExists = data.exists === true;
+        throw err;
+      }
+
+      return data as { uploadUrl: string; publicUrl: string };
+    },
+    []
+  );
+
+  /** Send the bytes straight to R2, reporting progress as they go. */
+  const putToStorage = useCallback(
+    (file: File, uploadUrl: string) =>
+      new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        const form = new FormData();
-        form.append("file", file);
-        form.append("slug", fileSlug);
-        if (allowReplace) form.append("allowReplace", "true");
 
         xhr.upload.addEventListener("progress", (e) => {
           if (e.lengthComputable) {
@@ -140,38 +169,25 @@ export function AudioUploadInput(props: StringInputProps) {
         });
 
         xhr.addEventListener("load", () => {
-          if (xhr.status === 201) {
-            try {
-              resolve(JSON.parse(xhr.responseText).url as string);
-            } catch {
-              reject(new Error("Upload succeeded but the response was unreadable"));
-            }
-            return;
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve();
+          } else {
+            reject(new Error(`Storage rejected the upload (HTTP ${xhr.status})`));
           }
-
-          let message = `Upload failed (HTTP ${xhr.status})`;
-          let alreadyExists = false;
-          try {
-            const body = JSON.parse(xhr.responseText);
-            if (body.error) message = body.error;
-            alreadyExists = body.exists === true;
-          } catch {
-            /* keep the default message */
-          }
-
-          const err = new Error(message) as Error & { alreadyExists?: boolean };
-          err.alreadyExists = alreadyExists;
-          reject(err);
         });
 
         xhr.addEventListener("error", () =>
-          reject(new Error("Network error. Check that the site is reachable."))
+          reject(
+            new Error(
+              "Could not reach storage. If this keeps happening, the bucket's CORS policy may not be applied yet."
+            )
+          )
         );
         xhr.addEventListener("abort", () => reject(new Error("Upload cancelled")));
 
-        xhr.open("POST", `${UPLOAD_URL}/api/audio/upload`);
-        xhr.setRequestHeader("x-upload-secret", UPLOAD_SECRET);
-        xhr.send(form);
+        xhr.open("PUT", uploadUrl);
+        xhr.setRequestHeader("Content-Type", "audio/mpeg");
+        xhr.send(file);
       }),
     []
   );
@@ -219,7 +235,9 @@ export function AudioUploadInput(props: StringInputProps) {
 
       let cdnUrl: string;
       try {
-        cdnUrl = await postFile(file, fileSlug, allowReplace);
+        const { uploadUrl, publicUrl } = await requestPresign(file, fileSlug, allowReplace);
+        await putToStorage(file, uploadUrl);
+        cdnUrl = publicUrl;
       } catch (err) {
         const e = err as Error & { alreadyExists?: boolean };
         if (e.alreadyExists) {
@@ -262,7 +280,7 @@ export function AudioUploadInput(props: StringInputProps) {
           : `Uploaded · ${formatBytes(file.size)} · enter the duration by hand`
       );
     },
-    [onChange, patch, postFile, slug]
+    [onChange, patch, requestPresign, putToStorage, slug]
   );
 
   /* ---- Input handlers ---- */
