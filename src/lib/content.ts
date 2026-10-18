@@ -35,7 +35,17 @@ export type Collection = {
   title: string;
   description: string;
   coverImageUrl: string | null;
+  /**
+   * Explicitly curated, hand-ordered track list. Populated for a curated
+   * collection like "The Wait"; empty for a plain theme.
+   */
   recordings: { _id: string; slug: string; coverImageUrl: string | null }[];
+  /**
+   * Recordings that point AT this collection via audioTrack.categories —
+   * the reverse of `recordings`. This is how a theme gets its members:
+   * the editor tags the recording, not the theme. Newest first.
+   */
+  taggedRecordings?: { _id: string; slug: string; coverImageUrl: string | null }[];
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

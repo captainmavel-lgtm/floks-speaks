@@ -41,7 +41,14 @@ const COLLECTION_PROJECTION = `{
   description,
   "coverImage": coverImage,
   "coverImageUrl": coverImage.asset->url,
-  "recordings": recordings[]->{ "_id": _id, "slug": slug.current, "coverImageUrl": coverImage.asset->url }
+  "recordings": recordings[]->{ "_id": _id, "slug": slug.current, "coverImageUrl": coverImage.asset->url },
+  "taggedRecordings": *[
+    _type == "audioTrack" && status == "published" && references(^._id)
+  ] | order(publishedAt desc) {
+    "_id": _id,
+    "slug": slug.current,
+    "coverImageUrl": coverImage.asset->url
+  }
 }`;
 
 /** Project the fields that map onto our Article type */

@@ -150,7 +150,14 @@ export default async function ListenPage({
           </h2>
           <div className="grid gap-6 sm:grid-cols-2">
             {collections.map((c) => {
-              const covers = (c.recordings ?? []).slice(0, 4);
+              // A curated collection carries its own ordered `recordings`.
+              // A theme carries none — its members are the recordings that
+              // tag it, which come back as `taggedRecordings`. Prefer the
+              // hand-ordered list when there is one.
+              const tracks = (c.recordings ?? []).length
+                ? c.recordings
+                : (c.taggedRecordings ?? []);
+              const covers = tracks.slice(0, 4);
               return (
                 <article
                   key={c._id}
@@ -177,7 +184,7 @@ export default async function ListenPage({
                     </div>
                   )}
                   <p className="mt-3 text-[0.8125rem] font-semibold uppercase tracking-[0.08em] text-amber">
-                    {(c.recordings ?? []).length} recordings
+                    {tracks.length} {tracks.length === 1 ? "recording" : "recordings"}
                   </p>
                 </article>
               );
