@@ -14,6 +14,7 @@ import {
 } from "@/lib/sanity-queries";
 import EpisodePlayButton from "@/components/episode-play-button";
 import Library from "@/components/library";
+import ThemeChips from "@/components/theme-chips";
 
 export const instant = false;
 
@@ -40,7 +41,18 @@ async function ThemedLibrary({
   const initialTheme: string = themes.includes(requested ?? "")
     ? requested!
     : "All";
-  return <Library recordings={recordings} initialTheme={initialTheme} />;
+  /* `key` is load-bearing. Library holds the active theme in useState, which
+     reads its initial value only on mount — and Next reuses the component
+     across client-side navigations. Without a key that changes with the
+     theme, clicking Healing after Faith updated the URL but left the grid
+     showing Faith, because the state from the first mount survived. */
+  return (
+    <Library
+      key={initialTheme}
+      recordings={recordings}
+      initialTheme={initialTheme}
+    />
+  );
 }
 
 export default async function ListenPage({
@@ -57,6 +69,18 @@ export default async function ListenPage({
 
   // Featured from homepage singleton, or first recording
   const featured = homepage?.featuredTrack ?? recordings[0];
+
+  /* One document type backs both threads and curated sets, so split them by
+     `kind` here. Documents created before `kind` existed have no value — a
+     theme is the safe reading, since every collection that predates the
+     field is one of the four threads. */
+  const isCurated = (c: (typeof collections)[number]) => c.kind === "collection";
+  const curated = collections.filter(isCurated);
+  const themeChips = collections.filter((c) => !isCurated(c)).map((c) => ({
+    name: c.title,
+    accentColor: c.accentColor,
+    count: (c.taggedRecordings ?? []).length,
+  }));
 
   return (
     <>
@@ -139,7 +163,22 @@ export default async function ListenPage({
         />
       </Suspense>
 
-      {/* COLLECTIONS */}
+      {/* THEMES — the standing threads, as chips */}
+      {themeChips.length > 0 && (
+        <section className="border-t border-hairline">
+          <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-12">
+            <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber">
+              Themes
+            </p>
+            <h2 className="font-display mb-6 text-h2 font-semibold">
+              The threads running through the work.
+            </h2>
+            <ThemeChips themes={themeChips} showCounts />
+          </div>
+        </section>
+      )}
+
+      {/* CURATED COLLECTIONS — hand-ordered sets like "The Wait" */}
       <section className="border-t border-hairline">
         <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-14">
           <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber">
@@ -149,7 +188,7 @@ export default async function ListenPage({
             Pieces that belong together, in the order they are meant to be heard.
           </h2>
           <div className="grid gap-6 sm:grid-cols-2">
-            {collections.map((c) => {
+            {curated.map((c) => {
               // A curated collection carries its own ordered `recordings`.
               // A theme carries none — its members are the recordings that
               // tag it, which come back as `taggedRecordings`. Prefer the
@@ -191,7 +230,9 @@ export default async function ListenPage({
             })}
             <div className="flex flex-col justify-center rounded-2xl border border-dashed border-edge-dark p-6">
               <p className="m-0 mb-1.5 font-display text-[1.0625rem] font-semibold">
-                More collections to come.
+                {curated.length === 0
+                  ? "Collections are on the way."
+                  : "More collections to come."}
               </p>
               <p className="m-0 text-[0.8125rem] leading-[1.6] text-ivory/66">
                 Floks groups pieces as the library grows.

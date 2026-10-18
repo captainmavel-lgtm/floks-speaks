@@ -8,7 +8,8 @@ import {
   formatDuration,
   formatDate,
 } from "@/lib/content";
-import { getRecordings, getHomepage, getArticles } from "@/lib/sanity-queries";
+import { getRecordings, getHomepage, getArticles, getCollections } from "@/lib/sanity-queries";
+import ThemeChips from "@/components/theme-chips";
 
 export const instant = false;
 import { SHOP_URL } from "@/lib/site";
@@ -21,10 +22,11 @@ import { SHOP_URL } from "@/lib/site";
    ========================================================================= */
 
 export default async function Home() {
-  const [recordings, homepage, articles] = await Promise.all([
+  const [recordings, homepage, articles, collections] = await Promise.all([
     getRecordings(),
     getHomepage(),
     getArticles(),
+    getCollections(),
   ]);
 
   // Featured track from the homepage singleton, or fall back to first recording
@@ -33,10 +35,17 @@ export default async function Home() {
   // Latest three by publish date (recordings already sorted newest-first)
   const latest = recordings.slice(0, 3);
 
-  // Theme names from the curated collections on the homepage, or fallback to static list
-  const themeNames: string[] =
-    homepage?.curatedCollections?.map((c: { title: string }) => c.title) ??
-    Object.keys(THEME_IMAGES);
+  /* Themes come from the collection documents, filtered to the standing
+     threads. Documents predating the `kind` field read as themes. If Sanity
+     has none yet, fall back to the four names the design was built around so
+     the section never renders empty. */
+  const themeChips = collections
+    .filter((c) => c.kind !== "collection")
+    .map((c) => ({ name: c.title, accentColor: c.accentColor }));
+  const chips =
+    themeChips.length > 0
+      ? themeChips
+      : Object.keys(THEME_IMAGES).map((name) => ({ name, accentColor: null }));
 
   return (
     <>
@@ -252,34 +261,11 @@ export default async function Home() {
     <section className="border-b border-hairline">
       <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-14">
         <h2 className="font-display text-h2 font-semibold">Explore by theme</h2>
-        <p className="mb-12 mt-4 max-w-[54ch] text-[1.0625rem] text-ivory/66">
-          Four threads running through the work. Each one opens the pieces that
+        <p className="mb-7 mt-4 max-w-[54ch] text-[1.0625rem] text-ivory/66">
+          The threads running through the work. Each one opens the pieces that
           belong to it.
         </p>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          {themeNames.map((t) => (
-            <Link
-              key={t}
-              href={`/listen?theme=${t}`}
-              aria-label={`Explore ${t} pieces`}
-              className="theme-card"
-            >
-              {THEME_IMAGES[t] && (
-              <Image
-                src={`/images/${THEME_IMAGES[t]}`}
-                alt=""
-                fill
-                sizes="(max-width: 640px) 46vw, (max-width: 1024px) 46vw, 25vw"
-                className="theme-card__img"
-              />
-              )}
-              <span className="theme-card__scrim" aria-hidden="true" />
-              <div className="theme-card__label">
-                <h3 className="theme-card__title">{t}</h3>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <ThemeChips themes={chips} />
       </div>
     </section>
 

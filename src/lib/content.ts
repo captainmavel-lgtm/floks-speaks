@@ -19,7 +19,13 @@ export type Recording = {
   _id: string;
   slug: string;
   title: string;
-  theme: string; // was Theme union; now the collection name from Sanity
+  theme: string; // primary theme — the label shown on a recording card
+  /**
+   * Every theme this recording is tagged with. `theme` is just the first of
+   * these. Filtering reads this, so a recording tagged Faith AND Healing
+   * appears under both rather than only the one that happens to sort first.
+   */
+  themes?: string[];
   description: string;
   durationSec: number;
   publishedAt: string;
@@ -35,6 +41,15 @@ export type Collection = {
   title: string;
   description: string;
   coverImageUrl: string | null;
+  /**
+   * "theme" — a standing thread recordings tag themselves into.
+   * "collection" — a curated, hand-ordered set like "The Wait".
+   * Older documents created before this field existed have no value; treat
+   * anything that is not "collection" as a theme.
+   */
+  kind?: "theme" | "collection" | null;
+  /** Studio override for the chip background. Null means use the fallback. */
+  accentColor?: string | null;
   /**
    * Explicitly curated, hand-ordered track list. Populated for a curated
    * collection like "The Wait"; empty for a plain theme.
@@ -161,6 +176,36 @@ export const THEME_IMAGES: Record<string, string> = {
   Culture: "theme-culture.webp",
   Healing: "theme-healing.webp",
 };
+
+/**
+ * Chip background per theme. Every value is light enough to carry Midnight
+ * (#111116) text at well past 4.5:1, which is why the chip label is always
+ * dark rather than ivory. A theme can override this from the studio via
+ * `accentColor`; this map is the fallback so a newly created theme still
+ * looks deliberate before anyone picks a colour.
+ */
+export const THEME_COLORS: Record<string, string> = {
+  Faith: "#f2a33a", // amber — the brand's own accent
+  Identity: "#b5a5ce", // lilac
+  Culture: "#dd9470", // clay
+  Healing: "#a3c4a8", // sage
+};
+
+/** Rotation used when a theme has neither an override nor a mapped colour. */
+const THEME_COLOR_CYCLE = ["#f2a33a", "#b5a5ce", "#dd9470", "#a3c4a8"];
+
+/**
+ * Resolve a theme's chip colour: studio override first, then the named
+ * fallback, then a stable pick from the cycle so the same name always lands
+ * on the same colour across pages.
+ */
+export function themeAccent(name: string, override?: string | null): string {
+  if (override) return override;
+  if (THEME_COLORS[name]) return THEME_COLORS[name];
+  let hash = 0;
+  for (let i = 0; i < name.length; i += 1) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+  return THEME_COLOR_CYCLE[hash % THEME_COLOR_CYCLE.length];
+}
 
 // ---------------------------------------------------------------------------
 // HELPERS — used by both server and client components

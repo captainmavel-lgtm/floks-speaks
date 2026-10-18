@@ -333,6 +333,73 @@ a[class*="btn"] {
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6);
 }
 
+/* ---------------------------------------------------------------------------
+   THEME CHIP
+
+   The small pill that replaced the tall photo cards. Sized off the primary
+   button ("Explore Spoken Word"): the same 48px tap target and the same
+   pill radius, so the two read as one family. The label is always Midnight
+   because every colour in THEME_COLORS is light — do not pass a dark accent
+   without revisiting the text colour here.
+   ------------------------------------------------------------------------ */
+.theme-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--color-midnight);
+  transition:
+    transform 180ms ease,
+    filter 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.theme-chip__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+/* Count sits in a well of the chip's own colour, darkened rather than tinted,
+   so it needs no second colour token per theme. */
+.theme-chip__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 23px;
+  height: 23px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgba(17, 17, 22, 0.17);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.theme-chip:hover,
+.theme-chip:focus-visible {
+  transform: translateY(-2px);
+  filter: brightness(1.07);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.34);
+}
+
+.theme-chip:focus-visible {
+  outline: 2px solid var(--color-ivory);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-chip:hover,
+  .theme-chip:focus-visible {
+    transform: none;
+  }
+}
+
 /* Each banner owns its colour, so hover lifts the image's own light. */
 .theme-card:hover .theme-card__img,
 .theme-card:focus-visible .theme-card__img {

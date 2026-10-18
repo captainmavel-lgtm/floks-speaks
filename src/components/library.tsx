@@ -26,9 +26,15 @@ export default function Library({
   recordings: Recording[];
   initialTheme?: string;
 }) {
-  // Derive unique theme names from the actual recordings
+  /* Every theme a recording carries, not just its first. A piece tagged Faith
+     AND Healing belongs under both chips; reading only `theme` dropped the
+     second tag and made that theme look empty. */
+  const themesOf = (r: Recording): string[] =>
+    r.themes?.length ? r.themes : r.theme ? [r.theme] : [];
+
   const themes = useMemo(() => {
-    const set = new Set(recordings.map((r) => r.theme).filter(Boolean));
+    const set = new Set<string>();
+    recordings.forEach((r) => themesOf(r).forEach((t) => t && set.add(t)));
     return Array.from(set).sort();
   }, [recordings]);
 
@@ -38,10 +44,12 @@ export default function Library({
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
     return recordings.filter((r) => {
-      const okTheme = theme === "All" || r.theme === theme;
+      const okTheme = theme === "All" || themesOf(r).includes(theme);
       const okText =
         !q ||
-        `${r.title} ${r.description} ${r.theme}`.toLowerCase().includes(q);
+        `${r.title} ${r.description} ${themesOf(r).join(" ")}`
+          .toLowerCase()
+          .includes(q);
       return okTheme && okText;
     });
   }, [recordings, query, theme]);
