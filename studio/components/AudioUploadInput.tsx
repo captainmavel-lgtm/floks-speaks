@@ -107,6 +107,10 @@ export function AudioUploadInput(props: StringInputProps) {
   const [error, setError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  // Escape hatch: upload the MP3 through the Cloudflare dashboard and paste
+  // the resulting URL here. Keeps the field usable when the direct uploader
+  // cannot run for any reason.
+  const [manualEntry, setManualEntry] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -420,27 +424,55 @@ export function AudioUploadInput(props: StringInputProps) {
       )}
 
       {/* Dropzone — shown when there is no file yet */}
-      {!value && !busy && (
-        <Card
-          padding={5}
-          radius={2}
-          tone={isDragging ? "primary" : "default"}
-          border
-          style={{ cursor: "pointer", textAlign: "center", borderStyle: "dashed" }}
-          onDragOver={onDragOver}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={onDrop}
-          onClick={() => inputRef.current?.click()}
-        >
-          <Stack space={2}>
-            <Text size={1} weight="semibold">
-              Drop an MP3 here, or click to choose a file
+      {!value && !busy && !manualEntry && (
+        <Stack space={2}>
+          <Card
+            padding={5}
+            radius={2}
+            tone={isDragging ? "primary" : "default"}
+            border
+            style={{ cursor: "pointer", textAlign: "center", borderStyle: "dashed" }}
+            onDragOver={onDragOver}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={onDrop}
+            onClick={() => inputRef.current?.click()}
+          >
+            <Stack space={2}>
+              <Text size={1} weight="semibold">
+                Drop an MP3 here, or click to choose a file
+              </Text>
+              <Text size={0} muted>
+                Up to 200 MB. The URL, duration and file size are filled in for you.
+              </Text>
+            </Stack>
+          </Card>
+          <Button
+            text="Or paste a URL instead"
+            mode="bleed"
+            fontSize={0}
+            onClick={() => setManualEntry(true)}
+          />
+        </Stack>
+      )}
+
+      {/* Manual fallback: upload via the Cloudflare dashboard, paste the URL */}
+      {!value && !busy && manualEntry && (
+        <Stack space={3}>
+          <Card padding={3} radius={2} tone="caution" border>
+            <Text size={1}>
+              Upload the MP3 in the Cloudflare dashboard (R2 → floks-speaks-audio
+              → Upload), then paste its public URL below. Duration and file size
+              must then be filled in by hand.
             </Text>
-            <Text size={0} muted>
-              Up to 200 MB. The URL, duration and file size are filled in for you.
-            </Text>
-          </Stack>
-        </Card>
+          </Card>
+          {props.renderDefault(props)}
+          <Button
+            text="Back to uploading a file"
+            mode="bleed"
+            fontSize={0}
+            onClick={() => setManualEntry(false)}
+          />
+        </Stack>
       )}
 
       {/* Progress */}
