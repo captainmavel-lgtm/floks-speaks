@@ -62,6 +62,13 @@ function r2Client() {
       accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID!,
       secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY!,
     },
+    // Recent AWS SDK versions add a CRC32 checksum header to PutObject by
+    // default and fold it into the signature. R2 does not implement those
+    // checksums, and a browser PUT cannot reproduce the header anyway, so the
+    // file transfers in full and is then rejected for a signature mismatch.
+    // Only sign checksums when the operation actually requires them.
+    requestChecksumCalculation: "WHEN_REQUIRED",
+    responseChecksumValidation: "WHEN_REQUIRED",
   });
 }
 
