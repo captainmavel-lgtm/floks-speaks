@@ -653,13 +653,16 @@ a[class*="btn"] {
 }
 
 .hero-img {
-  /* The studio portrait is 3:2, narrower than the hero box, so WIDTH fills and
-     the crop falls on the height — about 65% of the frame survives at a
-     typical desktop window. Felix's face sits at 5-47% of the height and the
-     microphone at 33-68%, so the anchor stays high to keep the face whole and
-     let the loss fall off the bottom of the stand. X does nothing at this
-     aspect; it only starts to matter on narrow windows. */
-  object-position: 50% 12%;
+  /* The studio portrait came in at 3:2 with Felix left of centre — straight
+     under the headline, with no empty field for the copy. The asset is now
+     extended to 2.73:1 by stretching and blurring its own left edge, which
+     puts Felix at 57-71% of the width and the microphone at 74-90%, clear of
+     a copy column that ends near 57%. The padded region sits under ~94% black
+     scrim, so it only has to read as room, not as detail.
+
+     At 2.73:1 the frame is wider than the hero box, so HEIGHT fills and the
+     crop falls on the width — the vertical is never cut. */
+  object-position: 50% 50%;
   filter: saturate(1.04) contrast(1.02);
 }
 
@@ -759,16 +762,19 @@ a[class*="btn"] {
     max-width: min(64%, 560px);
   }
   .hero-img {
-    object-position: 50% 10%;
+    /* Narrow desktop windows crop more width, so pan right to hold Felix and
+       the microphone as the frame tightens. */
+    object-position: 72% 50%;
   }
 }
 
-/* Mobile is art-directed, not the desktop crop shrunk. The studio frame is
-   3:2 into a 6:5 window, so 80% of the width survives and the height is never
-   cut. Felix spans 21-48% across and the microphone 53-81%, which is 60% of
-   the width — it fits inside that 80% window with room either side, so a
-   centred anchor holds both. This is the one place the whole subject reads at
-   phone size. */
+/* Mobile is art-directed, not the desktop crop shrunk. The same 2.73:1 asset
+   into a 6:5 window keeps only 44% of the width, and the subject — Felix at
+   57-71%, microphone at 74-90% — spans 33% of it. The window has to start
+   between 45% and 57% to hold both, which puts object-position between 80%
+   and 100%; 90% centres the pair. The blurred left field is cropped away
+   entirely here, which is the point: phones get the photograph, desktop gets
+   the room for type. */
 @media (max-width: 780px) {
   .hero {
     height: auto;
@@ -782,9 +788,7 @@ a[class*="btn"] {
     aspect-ratio: 6 / 5;
   }
   .hero-img {
-    /* Centred: the window spans 10-90% of the width, holding Felix and the
-       microphone with margin. Vertical is irrelevant — the full height shows. */
-    object-position: 50% 50%;
+    object-position: 90% 50%;
   }
   .hero-scrim {
     background: linear-gradient(

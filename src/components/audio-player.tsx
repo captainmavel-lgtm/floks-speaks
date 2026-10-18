@@ -256,8 +256,14 @@ function PlayerBar() {
         <Scrubber current={currentTime} duration={duration} onSeek={seek} />
       </div>
 
-      {/* Main bar */}
-      <div className="flex items-center gap-3 px-4 py-2">
+      {/* Main bar. Two rows on a phone, one on desktop: five transport
+          controls, artwork and a close button left the title about 40px on a
+          375px screen, which truncated "Away For A While" to "Awa...".
+          Stacking gives the title and its theme the full width and puts the
+          controls on their own centred row. */}
+      <div className="flex flex-col gap-1.5 px-4 py-2 sm:flex-row sm:items-center sm:gap-3">
+        {/* Artwork and title travel together — one row on a phone. */}
+        <div className="flex min-w-0 flex-1 items-center gap-3">
         {/* Cover art */}
         {track?.coverUrl && (
           <div className="flex-shrink-0 w-10 h-10 rounded overflow-hidden" style={{ background: "var(--color-charcoal)" }}>
@@ -274,7 +280,7 @@ function PlayerBar() {
         {/* Track info */}
         <div className="flex-1 min-w-0">
           <p
-            className="text-sm font-semibold truncate leading-tight"
+            className="text-sm font-semibold leading-tight line-clamp-2 sm:truncate"
             style={{ color: "var(--color-ivory)", fontFamily: "var(--font-display)" }}
           >
             {track?.title}
@@ -288,9 +294,10 @@ function PlayerBar() {
             </p>
           )}
         </div>
+        </div>
 
         {/* Controls */}
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex flex-shrink-0 items-center justify-center gap-1 sm:justify-end">
           {/* Previous track. Always enabled: past 3s it restarts the current
               piece, which is the behaviour listeners expect even on track 1.
               Every control in this row is inline-flex centred — a bare inline
