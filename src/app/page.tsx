@@ -52,8 +52,8 @@ export default async function Home() {
     <section className="hero relative flex items-center overflow-hidden border-b border-hairline">
       <div className="absolute inset-0">
         <Image
-          src="/images/floks-home-hero.webp"
-          alt="Felix Lokko on stage in an amber shirt, microphone in one hand and the other raised, under warm stage light"
+          src="/images/home-hero-studio.webp"
+          alt="A spoken-word artist at a studio microphone in a mudcloth-print tee, hands open mid-phrase, under warm amber light"
           fill
           priority
           fetchPriority="high"

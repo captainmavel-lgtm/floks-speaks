@@ -89,7 +89,7 @@ export default async function ListenPage({
       <section className="lib-hero relative flex items-end overflow-hidden border-b border-hairline">
         <div className="absolute inset-0">
           <Image
-            src="/images/hall-listen.jpg"
+            src="/images/floks-home-hero.webp"
             alt=""
             fill
             priority
