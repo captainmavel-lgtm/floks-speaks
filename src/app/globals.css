@@ -653,9 +653,13 @@ a[class*="btn"] {
 }
 
 .hero-img {
-  /* the raised hand sits at the top edge, so hold the anchor high and let any
-     crop fall off the lower body rather than the hand or the face */
-  object-position: 58% 12%;
+  /* The studio portrait is 3:2, narrower than the hero box, so WIDTH fills and
+     the crop falls on the height — about 65% of the frame survives at a
+     typical desktop window. Felix's face sits at 5-47% of the height and the
+     microphone at 33-68%, so the anchor stays high to keep the face whole and
+     let the loss fall off the bottom of the stand. X does nothing at this
+     aspect; it only starts to matter on narrow windows. */
+  object-position: 50% 12%;
   filter: saturate(1.04) contrast(1.02);
 }
 
@@ -755,19 +759,16 @@ a[class*="btn"] {
     max-width: min(64%, 560px);
   }
   .hero-img {
-    object-position: 66% 10%;
+    object-position: 50% 10%;
   }
 }
 
 /* Mobile is art-directed, not the desktop crop shrunk. The studio frame is
-   2.40:1, so a 6:5 window shows only about half its width and the rest is
-   cropped off the sides — the vertical is never cut.
-
-   The microphone sits at roughly 22-39% across and Felix's face at 46-61%, so
-   the window has to start between 13% and 20% to hold both. object-position
-   maps to the left edge as X x (1 - 0.499), which puts the usable range at
-   26-40%; 33% centres the pair with margin either side. Panning further right
-   loses the microphone, which is the point of the shot. */
+   3:2 into a 6:5 window, so 80% of the width survives and the height is never
+   cut. Felix spans 21-48% across and the microphone 53-81%, which is 60% of
+   the width — it fits inside that 80% window with room either side, so a
+   centred anchor holds both. This is the one place the whole subject reads at
+   phone size. */
 @media (max-width: 780px) {
   .hero {
     height: auto;
@@ -781,8 +782,9 @@ a[class*="btn"] {
     aspect-ratio: 6 / 5;
   }
   .hero-img {
-    /* Vertical is irrelevant here: at 2.40:1 into 6:5 the full height shows. */
-    object-position: 33% 50%;
+    /* Centred: the window spans 10-90% of the width, holding Felix and the
+       microphone with margin. Vertical is irrelevant — the full height shows. */
+    object-position: 50% 50%;
   }
   .hero-scrim {
     background: linear-gradient(

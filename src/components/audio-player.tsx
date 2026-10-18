@@ -73,7 +73,7 @@ function SkipBack15({ size = 18 }: { size?: number }) {
   );
 }
 
-function PrevTrack({ size = 17 }: { size?: number }) {
+function PrevTrack({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M7 6h2v12H7zm3.5 6L19 18V6z" />
@@ -81,7 +81,7 @@ function PrevTrack({ size = 17 }: { size?: number }) {
   );
 }
 
-function NextTrack({ size = 17 }: { size?: number }) {
+function NextTrack({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M15 6h2v12h-2zM5 18l8.5-6L5 6z" />
@@ -292,11 +292,14 @@ function PlayerBar() {
         {/* Controls */}
         <div className="flex items-center gap-1 flex-shrink-0">
           {/* Previous track. Always enabled: past 3s it restarts the current
-              piece, which is the behaviour listeners expect even on track 1. */}
+              piece, which is the behaviour listeners expect even on track 1.
+              Every control in this row is inline-flex centred — a bare inline
+              <svg> sits on the text baseline, which left this one riding high
+              next to the skip buttons. */}
           <button
             onClick={previous}
             aria-label={hasPrevious ? "Previous recording" : "Restart recording"}
-            className="hidden sm:flex p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
+            className="inline-flex items-center justify-center p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
             style={{ color: "rgba(242,237,229,0.7)", "--tw-ring-color": "var(--color-amber)" } as React.CSSProperties}
           >
             <PrevTrack />
@@ -306,7 +309,7 @@ function PlayerBar() {
           <button
             onClick={() => skip(-15)}
             aria-label="Skip back 15 seconds"
-            className="p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
+            className="inline-flex items-center justify-center p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
             style={{ color: "rgba(242,237,229,0.7)", "--tw-ring-color": "var(--color-amber)" } as React.CSSProperties}
           >
             <SkipBack15 />
@@ -331,7 +334,7 @@ function PlayerBar() {
           <button
             onClick={() => skip(15)}
             aria-label="Skip forward 15 seconds"
-            className="p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
+            className="inline-flex items-center justify-center p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
             style={{ color: "rgba(242,237,229,0.7)", "--tw-ring-color": "var(--color-amber)" } as React.CSSProperties}
           >
             <SkipForward15 />
@@ -343,7 +346,7 @@ function PlayerBar() {
             onClick={next}
             disabled={!hasNext}
             aria-label="Next recording"
-            className="p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            className="inline-flex items-center justify-center p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
             style={{ color: "rgba(242,237,229,0.7)", "--tw-ring-color": "var(--color-amber)" } as React.CSSProperties}
           >
             <NextTrack />
