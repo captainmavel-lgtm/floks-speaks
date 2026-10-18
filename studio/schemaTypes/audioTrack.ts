@@ -138,9 +138,14 @@ export const audioTrack = defineType({
       type: "string",
       group: "details",
       description:
-        "Permanent episode identifier. Migrated episodes: must carry the original GUID exactly. Never regenerate this after first publish — podcast apps use it to tell episodes apart.",
+        "Permanent episode identifier. Migrated episodes: paste the original GUID from the existing RSS feed, exactly. Once this recording is live, DO NOT change it — podcast apps use it to tell episodes apart, and editing it makes every app treat the episode as brand new.",
       validation: (Rule) => Rule.required(),
-      readOnly: ({ document }) => Boolean(document?.guid),
+      // Deliberately editable. This was previously locked as soon as the field
+      // held any value, which sealed in placeholder GUIDs typed before the
+      // real one had been looked up, with no way to correct them from the
+      // studio. The rule it is meant to enforce — never change this after the
+      // episode is published — is a judgement the editor has to make anyway,
+      // so it lives in the description rather than in a lock that fires early.
     }),
     defineField({
       name: "explicit",
