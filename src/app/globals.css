@@ -150,23 +150,31 @@ a[class*="btn"] {
 
 .lib-hero-img {
   object-position: 50% 50%;
-  filter: saturate(1.04) contrast(1.03);
+  filter: saturate(1.06) contrast(1.02) brightness(1.15);
 }
 
+/* Two stacked gradients, so their alphas multiply rather than add. The old
+   values were tuned for the hall photograph and left the stage shot at about
+   99% black on the left and 93% at the foot — the subject was effectively
+   invisible. These lift the right and lower bands hard (to roughly 75% at the
+   bottom right, where the photograph actually is) while keeping the upper
+   left heavy, because that is where the masthead copy sits and ivory text
+   needs the cover. Lighten the first stop of either gradient much further and
+   the headline starts to lose contrast. */
 .lib-scrim {
   background:
     linear-gradient(
       90deg,
-      rgba(17, 17, 22, 0.93) 0%,
-      rgba(17, 17, 22, 0.84) 34%,
-      rgba(17, 17, 22, 0.42) 62%,
-      rgba(17, 17, 22, 0.3) 100%
+      rgba(17, 17, 22, 0.86) 0%,
+      rgba(17, 17, 22, 0.72) 34%,
+      rgba(17, 17, 22, 0.3) 62%,
+      rgba(17, 17, 22, 0.12) 100%
     ),
     linear-gradient(
       0deg,
-      rgba(17, 17, 22, 0.9) 0%,
-      rgba(17, 17, 22, 0.5) 34%,
-      rgba(17, 17, 22, 0.3) 100%
+      rgba(17, 17, 22, 0.72) 0%,
+      rgba(17, 17, 22, 0.3) 34%,
+      rgba(17, 17, 22, 0.1) 100%
     );
 }
 
