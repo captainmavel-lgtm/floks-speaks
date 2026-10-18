@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   type Recording,
   formatDuration,
@@ -198,9 +199,10 @@ export default async function ListenPage({
                 : (c.taggedRecordings ?? []);
               const covers = tracks.slice(0, 4);
               return (
-                <article
+                <Link
                   key={c._id}
-                  className="rounded-2xl border border-hairline bg-charcoal p-6"
+                  href={`/listen/collection/${c.slug}`}
+                  className="collection-card block rounded-2xl border border-hairline bg-charcoal p-6 no-underline"
                 >
                   <h3 className="font-display text-[1.375rem] font-semibold">
                     {c.title}
@@ -225,7 +227,7 @@ export default async function ListenPage({
                   <p className="mt-3 text-[0.8125rem] font-semibold uppercase tracking-[0.08em] text-amber">
                     {tracks.length} {tracks.length === 1 ? "recording" : "recordings"}
                   </p>
-                </article>
+                </Link>
               );
             })}
             <div className="flex flex-col justify-center rounded-2xl border border-dashed border-edge-dark p-6">

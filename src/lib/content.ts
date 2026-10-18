@@ -185,14 +185,14 @@ export const THEME_IMAGES: Record<string, string> = {
  * looks deliberate before anyone picks a colour.
  */
 export const THEME_COLORS: Record<string, string> = {
-  Faith: "#f2a33a", // amber — the brand's own accent
-  Identity: "#b5a5ce", // lilac
-  Culture: "#dd9470", // clay
-  Healing: "#a3c4a8", // sage
+  Faith: "#F2A33A", // vibrant amber — the brand's own accent. 9.03:1 on Midnight
+  Identity: "#B5A5CE", // muted lilac. 8.28:1
+  Healing: "#4FC9B0", // aqua. 9.25:1
+  Culture: "#E2566B", // rose. 5.18:1 — the tightest of the four, still past AA
 };
 
 /** Rotation used when a theme has neither an override nor a mapped colour. */
-const THEME_COLOR_CYCLE = ["#f2a33a", "#b5a5ce", "#dd9470", "#a3c4a8"];
+const THEME_COLOR_CYCLE = ["#F2A33A", "#B5A5CE", "#4FC9B0", "#E2566B"];
 
 /**
  * Resolve a theme's chip colour: studio override first, then the named

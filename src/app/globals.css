@@ -400,6 +400,32 @@ a[class*="btn"] {
   }
 }
 
+/* Collection cards are links, so they need to look like one on hover. */
+.collection-card {
+  transition:
+    border-color 200ms ease,
+    background 200ms ease,
+    transform 200ms ease;
+}
+
+.collection-card:hover,
+.collection-card:focus-visible {
+  border-color: rgba(242, 163, 58, 0.5);
+  transform: translateY(-2px);
+}
+
+.collection-card:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collection-card:hover,
+  .collection-card:focus-visible {
+    transform: none;
+  }
+}
+
 /* Each banner owns its colour, so hover lifts the image's own light. */
 .theme-card:hover .theme-card__img,
 .theme-card:focus-visible .theme-card__img {

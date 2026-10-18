@@ -126,6 +126,42 @@ export const getThemes = unstable_cache(
 );
 
 /**
+ * One collection by slug, with its tracks fully projected so the page can
+ * play them. Curated order is preserved for a curated set; a theme falls
+ * back to its tagged recordings, newest first.
+ */
+export const getCollectionBySlug = unstable_cache(
+  async (slug: string) => {
+    const query = `*[_type == "collection" && slug.current == $slug][0]{
+      "_id": _id,
+      "slug": slug.current,
+      "title": name,
+      description,
+      kind,
+      accentColor,
+      "coverImageUrl": coverImage.asset->url,
+      "tracks": recordings[]->${RECORDING_PROJECTION},
+      "taggedTracks": *[
+        _type == "audioTrack" && status == "published" && references(^._id)
+      ] | order(publishedAt desc) ${RECORDING_PROJECTION}
+    }`;
+    return client.fetch<{
+      _id: string;
+      slug: string;
+      title: string;
+      description?: string;
+      kind?: "theme" | "collection" | null;
+      accentColor?: string | null;
+      coverImageUrl: string | null;
+      tracks: Recording[] | null;
+      taggedTracks: Recording[] | null;
+    } | null>(query, { slug });
+  },
+  ["collection-by-slug"],
+  { revalidate: 60, tags: ["collections", "recordings"] },
+);
+
+/**
  * Homepage singleton — featured track and curated collections.
  */
 export const getHomepage = unstable_cache(
