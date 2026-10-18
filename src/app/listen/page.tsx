@@ -230,16 +230,19 @@ export default async function ListenPage({
                 </Link>
               );
             })}
-            <div className="flex flex-col justify-center rounded-2xl border border-dashed border-edge-dark p-6">
-              <p className="m-0 mb-1.5 font-display text-[1.0625rem] font-semibold">
-                {curated.length === 0
-                  ? "Collections are on the way."
-                  : "More collections to come."}
-              </p>
-              <p className="m-0 text-[0.8125rem] leading-[1.6] text-ivory/66">
-                Floks groups pieces as the library grows.
-              </p>
-            </div>
+            {/* Empty state only. Once a collection exists the real cards
+                carry the section, and a dashed placeholder beside them just
+                reads as a gap in the grid. */}
+            {curated.length === 0 && (
+              <div className="flex flex-col justify-center rounded-2xl border border-dashed border-edge-dark p-6">
+                <p className="m-0 mb-1.5 font-display text-[1.0625rem] font-semibold">
+                  Collections are on the way.
+                </p>
+                <p className="m-0 text-[0.8125rem] leading-[1.6] text-ivory/66">
+                  Floks groups pieces as the library grows.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>
