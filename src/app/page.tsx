@@ -53,7 +53,7 @@ export default async function Home() {
       <div className="absolute inset-0">
         <Image
           src="/images/home-hero-studio.webp"
-          alt="A spoken-word artist at a studio microphone in a mudcloth-print tee, hands open mid-phrase, under warm amber light"
+          alt="Felix Lokko at a studio microphone in a mudcloth-print tee, hands open mid-phrase, under warm amber light"
           fill
           priority
           fetchPriority="high"
