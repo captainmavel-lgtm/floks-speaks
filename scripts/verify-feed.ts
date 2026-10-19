@@ -30,6 +30,10 @@ const SNAPSHOT = join(ROOT, "docs/phase5/sanity-catalogue-snapshot.json");
 const PROJECT = "0j0cu34s";
 const DATASET = "production";
 
+/* Must mirror the default in src/lib/podcast-feed.ts. */
+const AUDIO_HOST =
+  process.env.AUDIO_HOST ?? "pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev";
+
 type Baseline = {
   episodeCount: number;
   episodes: {
@@ -152,8 +156,15 @@ async function main() {
     check("GUID is the original", gotGuid === want.guid, `got ${gotGuid}\n        want ${want.guid}`);
     check("GUID marked isPermaLink=false", got.includes('<guid isPermaLink="false">'));
     check("enclosure byte length", gotLen === String(want.enclosureLength), `got ${gotLen}, want ${want.enclosureLength}`);
-    check("enclosure served from media.floksspeaks.org", Boolean(gotUrl?.startsWith("https://media.floksspeaks.org/")), `got ${gotUrl}`);
-    check("no r2.dev hostname leaked", !got.includes("r2.dev"));
+    /* Whichever host is configured, every enclosure must use the same one and
+       it must be the one that is actually serving. Pinning the check to a
+       literal hostname would have passed happily while the live feed pointed
+       at a domain with no certificate, which is exactly what happened. */
+    check(
+      `enclosure served from ${AUDIO_HOST}`,
+      Boolean(gotUrl?.startsWith(`https://${AUDIO_HOST}/`)),
+      `got ${gotUrl}`,
+    );
 
     if (gotDate !== want.pubDate) {
       const drift = Math.abs(new Date(gotDate!).getTime() - new Date(want.pubDate).getTime()) / 1000;
