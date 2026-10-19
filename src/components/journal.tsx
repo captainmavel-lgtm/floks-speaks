@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { PortableText } from "@portabletext/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   type Article,
   formatDate,
@@ -10,12 +11,10 @@ import {
 /* ============================================================================
    JOURNAL — Phase 5
 
-   Articles expand in place rather than opening their own route. That is a
-   deliberate Phase 2 decision: the Journal has one published article, and a
-   dedicated route per article would mean a page whose only content is one
-   essay with no siblings to navigate to. When the Journal has a run of
-   articles, the open state here becomes the route and this component keeps
-   the same filter UI.
+   Each card links to the article's own route at /blog/<slug>. Articles used
+   to expand in place instead, from a time before that route existed — which
+   left every piece unlinkable and unshareable, and stranded the share
+   buttons on a page nothing pointed at. The filter UI is unchanged.
 
    Categories are now derived from the articles themselves (via Sanity),
    so the component no longer imports a static ARTICLE_CATEGORIES array.
@@ -37,52 +36,10 @@ function ptToText(blocks: any[]): string {
     .join(" ");
 }
 
-/** Custom portable text components for the journal article body */
-const ptComponents = {
-  block: {
-    normal: ({ children }: any) => (
-      <p className="mb-[1.1em] text-lede leading-[1.75] text-midnight/82 last:mb-0">
-        {children}
-      </p>
-    ),
-    h2: ({ children }: any) => (
-      <h3 className="font-editorial mt-6 mb-3 text-[1.25rem] leading-[1.3] text-midnight">
-        {children}
-      </h3>
-    ),
-    h3: ({ children }: any) => (
-      <h4 className="font-display mt-5 mb-2 text-[1.0625rem] font-semibold text-midnight">
-        {children}
-      </h4>
-    ),
-    blockquote: ({ children }: any) => (
-      <blockquote className="my-5 border-l-[3px] border-amber-deep pl-5 italic text-midnight/72">
-        {children}
-      </blockquote>
-    ),
-  },
-  marks: {
-    strong: ({ children }: any) => (
-      <strong className="font-semibold text-midnight">{children}</strong>
-    ),
-    em: ({ children }: any) => <em>{children}</em>,
-    link: ({ value, children }: any) => (
-      <a
-        href={value?.href}
-        className="underline decoration-amber-deep/40 underline-offset-2 hover:decoration-amber-deep"
-        target={value?.href?.startsWith("http") ? "_blank" : undefined}
-        rel={value?.href?.startsWith("http") ? "noopener noreferrer" : undefined}
-      >
-        {children}
-      </a>
-    ),
-  },
-};
-
 export default function Journal({ articles }: { articles: Article[] }) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>("All");
-  const [open, setOpen] = useState<string | null>(null);
   const didHash = useRef(false);
 
   // Derive unique category names from the actual articles
@@ -91,22 +48,17 @@ export default function Journal({ articles }: { articles: Article[] }) {
     return Array.from(set).sort();
   }, [articles]);
 
-  /* Arriving from the About timeline link, /blog#testimony-words-gave-courage,
-     must land the reader in the open article, not on a closed card they then
-     have to find and click. Runs once: a later hash change from the reader's
-     own navigation should not fight their open state. */
+  /* Older links point at /blog#<slug> — the About timeline still does. Now
+     that each article has its own page, send those straight to it rather
+     than scrolling to a card. */
   useEffect(() => {
     if (didHash.current) return;
     didHash.current = true;
     const slug = window.location.hash.slice(1);
     if (!slug) return;
     if (!articles.some((a) => a.slug === slug)) return;
-    setOpen(slug);
-    // after paint, so scroll-margin-top applies to the expanded card
-    requestAnimationFrame(() => {
-      document.getElementById(slug)?.scrollIntoView({ block: "start" });
-    });
-  }, [articles]);
+    router.replace(`/blog/${slug}`);
+  }, [articles, router]);
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -199,15 +151,11 @@ export default function Journal({ articles }: { articles: Article[] }) {
         {shown.length > 0 ? (
           <div className="journal-grid">
             {shown.map((a) => {
-              const isOpen = open === a.slug;
               return (
                 <article
                   key={a._id}
                   id={a.slug}
-                  className={[
-                    "scroll-mt-[104px] rounded-2xl border border-hairline-ink bg-white/45 p-6",
-                    isOpen ? "col-span-full" : "",
-                  ].join(" ")}
+                  className="scroll-mt-[104px] rounded-2xl border border-hairline-ink bg-white/45 p-6"
                 >
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="rounded-full border border-lilac-deep px-3 py-[6px] text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-lilac-ink">
@@ -219,46 +167,25 @@ export default function Journal({ articles }: { articles: Article[] }) {
                   </div>
 
                   <h2 className="font-editorial mt-4 mb-3 text-[1.5rem] leading-[1.22]">
-                    {a.title}
+                    <Link
+                      href={`/blog/${a.slug}`}
+                      className="text-midnight no-underline hover:underline"
+                    >
+                      {a.title}
+                    </Link>
                   </h2>
 
-                  {!isOpen && (
-                    <p className="mb-5 leading-[1.65] text-midnight/78">
-                      {a.excerpt}
-                    </p>
-                  )}
+                  <p className="mb-5 leading-[1.65] text-midnight/78">
+                    {a.excerpt}
+                  </p>
 
-                  {/* The region the disclosure button controls. Rendered either
-                      way so the aria-controls reference always resolves. */}
-                  <div id={`${a.slug}-body`} hidden={!isOpen}>
-                    {isOpen && (
-                      <div className="mb-6 max-w-[68ch]">
-                        <PortableText value={a.body} components={ptComponents} />
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    type="button"
-                    aria-expanded={isOpen}
-                    aria-controls={`${a.slug}-body`}
-                    onClick={() => {
-                      const next = isOpen ? null : a.slug;
-                      setOpen(next);
-                      /* Collapsing a long article leaves the reader far below
-                         where the card now ends, so return them to it. */
-                      if (!next) {
-                        requestAnimationFrame(() => {
-                          document
-                            .getElementById(a.slug)
-                            ?.scrollIntoView({ block: "start" });
-                        });
-                      }
-                    }}
-                    className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-edge-ink px-5 text-[0.875rem] font-semibold text-midnight transition-colors duration-200 hover:border-midnight/70"
+                  <Link
+                    href={`/blog/${a.slug}`}
+                    aria-label={`Read ${a.title}`}
+                    className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-edge-ink px-5 text-[0.875rem] font-semibold text-midnight no-underline transition-colors duration-200 hover:border-midnight/70"
                   >
-                    {isOpen ? "Close" : "Read the full article"}
-                  </button>
+                    Read the full article
+                  </Link>
                 </article>
               );
             })}
