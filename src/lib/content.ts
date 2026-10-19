@@ -122,7 +122,16 @@ export const JOURNEY: Milestone[] = [
     major: true,
     body: "A young man struggling with his sight had given up on his academics until he encountered Felix’s spoken-word pieces. One piece rekindled his hope and inspired him to persevere. Today he is pursuing a Bachelor of Science in Administration at the University of Ghana Business School. The testimony revealed the life-changing power of spoken word and challenged Felix to pursue this ministry with greater intentionality.",
     link: {
-      href: "/blog#testimony-words-gave-courage",
+      // The article itself, not the blog index. This pointed at
+      // /blog#testimony-words-gave-courage, an anchor that was never rendered
+      // on any page, so the link landed readers at the top of the listing and
+      // left them to find the piece by eye.
+      //
+      // The slug is spelled out here rather than looked up, because this
+      // milestone is about one specific article and no query would make that
+      // relationship any clearer. It holds as long as the slug does, and the
+      // slug is already documented to the client as permanent once published.
+      href: "/blog/when-words-gave-someone-the-courage-to-continue",
       label: "Read the Full Testimony",
     },
   },
