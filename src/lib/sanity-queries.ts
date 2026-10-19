@@ -61,7 +61,9 @@ const ARTICLE_PROJECTION = `{
   "category": category->name,
   title,
   excerpt,
-  "coverImageUrl": featuredImage.asset->url,
+  /* Fall back to the author photo when no featured image is set, so a piece
+     written without artwork still has a face at the top rather than a gap. */
+  "coverImageUrl": coalesce(featuredImage.asset->url, authorPhoto.asset->url),
   "coverImage": featuredImage,
   publishedAt,
   "readMins": round(length(pt::text(body)) / 1000),

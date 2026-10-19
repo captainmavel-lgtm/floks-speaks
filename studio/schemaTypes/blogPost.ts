@@ -41,7 +41,8 @@ export const blogPost = defineType({
       type: "image",
       group: "basics",
       options: { hotspot: true },
-      validation: (Rule) => Rule.required(),
+      description:
+        "Optional. Landscape, around 1600 x 900. If you leave this empty the article uses the author photo instead, and if there is no author photo either it simply runs without a picture.",
     }),
     defineField({
       name: "category",
