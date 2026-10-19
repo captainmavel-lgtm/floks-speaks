@@ -100,9 +100,17 @@ export default function SiteFooter() {
                 {n.label}
               </Link>
             ))}
-            <span className="text-[0.875rem] text-ivory/66">
-              Built by MavelogxDigital
-            </span>
+            <p className="m-0 text-[0.875rem] text-ivory/66">
+              Designed and developed by{" "}
+              <a
+                href="https://mavelogxdigital.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-[#e85c6e] no-underline underline-offset-4 transition-colors hover:text-[#f08193] hover:underline focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e85c6e]"
+              >
+                MavelogxDigital
+              </a>
+            </p>
           </div>
         </div>
       </div>
