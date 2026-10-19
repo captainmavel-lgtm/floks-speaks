@@ -841,3 +841,90 @@ a[class*="btn"] {
   border-color: var(--color-midnight, #111116);
   background: rgba(17, 17, 22, 0.04);
 }
+
+/* =========================================================================
+   AGENCY CREDIT (footer)
+
+   The MavelogxDigital signature, matching the one on mavelscorner.blog so
+   the credit reads the same wherever the agency has built a site: the brand
+   colours sweeping left to right through the letters, on a four second loop.
+
+   The colour lives in a gradient that is clipped to the glyphs, which means
+   the text itself is painted transparent. That is the whole trick, and it is
+   also its one danger: anything that stops the gradient painting leaves an
+   invisible word behind. This file's footer component has shipped invisible
+   text twice already (see the note at the top of site-footer.tsx), so the
+   effect is layered on top of a plain coral rather than replacing it.
+
+     - the base rule sets a solid colour that works on its own
+     - @supports adds the gradient only where background-clip:text exists
+     - reduced motion keeps the gradient, drops the movement
+     - forced colours hands the whole thing back to the system palette
+
+   Remove any of those four and the credit can vanish on somebody's screen.
+   ========================================================================= */
+
+.credit-line {
+  margin: 0;
+  font-size: 0.875rem;
+  color: rgba(242, 237, 229, 0.66);
+}
+
+.credit-brand {
+  font-weight: 700;
+  color: #e85c6e;
+  text-decoration: none;
+  transition: opacity 0.25s;
+}
+.credit-brand:hover {
+  opacity: 0.82;
+}
+
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+  .credit-brand {
+    background: linear-gradient(
+        90deg,
+        #e85c6e,
+        #f5a825,
+        #7070bb,
+        #3bbfa0,
+        #4a9dc4,
+        #f47820,
+        #e85c6e
+      )
+      0 0 / 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: credit-sweep 4s linear infinite;
+  }
+}
+
+@keyframes credit-sweep {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+/* A gradient that never stops moving is a problem for readers who are
+   sensitive to motion, so hold it still and let the colours sit. */
+@media (prefers-reduced-motion: reduce) {
+  .credit-brand {
+    animation: none;
+    background-position: 25% 50%;
+  }
+}
+
+/* Windows high contrast replaces the palette outright. Transparent text fill
+   would survive that substitution and stay transparent, so step aside. */
+@media (forced-colors: active) {
+  .credit-brand {
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    color: LinkText;
+    animation: none;
+  }
+}
