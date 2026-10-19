@@ -1,0 +1,26 @@
+{
+  "_comment": [
+    "Offline fallback for scripts/verify-feed.ts, captured 2026-10-19.",
+    "",
+    "The script fetches the live dataset first and only falls back to this",
+    "file when it cannot reach Sanity. Run it with network access and this",
+    "file is ignored entirely.",
+    "",
+    "Every field GATE M compares — guid, publishedAt, fileSize, duration,",
+    "title, audioUrl — is verbatim from the dataset. The summary values are",
+    "NOT verbatim: they are shortened stand-ins, because the capture tool",
+    "could not return the full text. Nothing in the comparison reads them.",
+    "Escaping of free text is proven separately by the hostile-input case in",
+    "the script rather than by whatever these happen to contain."
+  ],
+  "episodes": [
+    { "_id": "e1", "slug": "away-for-a-while",       "title": "Away For A While",       "summary": "Stepping back from the noise, and how distance brings renewal.",        "publishedAt": "2026-05-01T04:32:00.000Z", "guid": "1d18e2bc-e587-46dd-841b-4f0a86811af1", "audioUrl": "https://pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev/episodes/away-for-a-while.mp3",       "duration": 113, "fileSize": 3484749, "mimeType": "audio/mpeg", "explicit": false, "coverImageUrl": null },
+    { "_id": "e2", "slug": "master-what-you-do",     "title": "Master What You Do",     "summary": "A call to excellence: sharpen your skill so you can serve well.",      "publishedAt": "2026-05-08T04:34:00.000Z", "guid": "1e7804b9-19e6-4f16-939d-5f5040c60a33", "audioUrl": "https://pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev/episodes/master-what-you-do.mp3",     "duration": 105, "fileSize": 3185757, "mimeType": "audio/mpeg", "explicit": false, "coverImageUrl": null },
+    { "_id": "e3", "slug": "i-wish-i-were",          "title": "I Wish I Were",          "summary": "Use what God gave you, however small it seems, to serve others.",     "publishedAt": "2026-05-15T04:39:00.000Z", "guid": "692dd288-fbeb-4a5a-8e7a-89d38d9acc4f", "audioUrl": "https://pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev/episodes/i-wish-i-were.mp3",          "duration": 151, "fileSize": 5183277, "mimeType": "audio/mpeg", "explicit": false, "coverImageUrl": null },
+    { "_id": "e4", "slug": "mekae-i-remember",       "title": "Mekae (I Remember)",     "summary": "The grind young people endure before a breakthrough, and its purpose.", "publishedAt": "2026-05-22T04:46:00.000Z", "guid": "7feeeae0-aadd-4d03-a205-8751ed4fdb1b", "audioUrl": "https://pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev/episodes/mekae-i-remember.mp3",       "duration": 150, "fileSize": 4562925, "mimeType": "audio/mpeg", "explicit": false, "coverImageUrl": null },
+    { "_id": "e5", "slug": "jesus-call",             "title": "Jesus' Call",            "summary": "Christ's invitation to a transformed life of purpose and grace.",      "publishedAt": "2026-05-29T04:48:00.000Z", "guid": "9246d43a-e541-4602-b372-fe95703c2dec", "audioUrl": "https://pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev/episodes/jesus-call.mp3",             "duration": 130, "fileSize": 4167165, "mimeType": "audio/mpeg", "explicit": false, "coverImageUrl": null },
+    { "_id": "e6", "slug": "education",              "title": "Education",              "summary": "Learning, formal and informal, as the foundation for growth.",         "publishedAt": "2026-06-05T04:51:00.000Z", "guid": "3f108d64-f577-4970-bc53-128f6275c296", "audioUrl": "https://pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev/episodes/education.mp3",              "duration": 96,  "fileSize": 3129381, "mimeType": "audio/mpeg", "explicit": false, "coverImageUrl": null },
+    { "_id": "e7", "slug": "ebi-jesus-wey-dey-rule", "title": "Ebi Jesus Wey Dey Rule", "summary": "Jesus' authority over all things, King above every circumstance.",     "publishedAt": "2026-06-12T04:01:00.000Z", "guid": "b517391b-219e-453d-8ede-19b53e15a3ea", "audioUrl": "https://pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev/episodes/ebi-jesus-wey-dey-rule.mp3", "duration": 106, "fileSize": 3566493, "mimeType": "audio/mpeg", "explicit": false, "coverImageUrl": null },
+    { "_id": "e8", "slug": "my-real-gee",            "title": "My Real Gee",            "summary": "Jesus as a close friend and constant companion in every season.",     "publishedAt": "2026-10-06T23:18:00.000Z", "guid": "f616c1ad-4cf4-410f-9d23-f2d6138a75d9", "audioUrl": "https://pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev/episodes/my-real-gee.mp3",            "duration": 138, "fileSize": 5512320, "mimeType": "audio/mpeg", "explicit": false, "coverImageUrl": null }
+  ]
+}

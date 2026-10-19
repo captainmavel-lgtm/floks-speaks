@@ -238,3 +238,55 @@ export const getSiteSettings = unstable_cache(
   ["site-settings"],
   { revalidate: 300, tags: ["site-settings"] },
 );
+
+/* ---------------------------------------------------------------------------
+   PODCAST FEED — Build Bible Phase 5
+
+   The feed needs fields the site itself never renders: the GUID that podcast
+   apps use to tell episodes apart, the byte length the RSS enclosure requires,
+   and the MIME type. They are deliberately not in RECORDING_PROJECTION, which
+   exists to match the on-screen Recording type.
+
+   Ordered oldest first here and reversed at render. Ordering by publishedAt
+   descending straight from GROQ would be equivalent, but the migration is
+   checked against an archive that reads oldest first, and keeping one order
+   end to end means the diff in docs/phase5 can be read without mentally
+   flipping it.
+   ------------------------------------------------------------------------ */
+
+export type FeedRecording = {
+  _id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  publishedAt: string;
+  guid: string;
+  audioUrl: string;
+  duration: number;
+  fileSize: number;
+  mimeType: string | null;
+  explicit: boolean | null;
+  coverImageUrl: string | null;
+};
+
+export const getFeedRecordings = unstable_cache(
+  async () => {
+    const query = `*[_type == "audioTrack" && status == "published"] | order(publishedAt asc) {
+      "_id": _id,
+      "slug": slug.current,
+      title,
+      summary,
+      publishedAt,
+      guid,
+      audioUrl,
+      duration,
+      fileSize,
+      mimeType,
+      explicit,
+      "coverImageUrl": coverImage.asset->url
+    }`;
+    return client.fetch<FeedRecording[]>(query);
+  },
+  ["feed-recordings"],
+  { revalidate: 60, tags: ["recordings"] },
+);

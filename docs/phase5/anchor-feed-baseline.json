@@ -1,0 +1,43 @@
+{
+  "_comment": [
+    "GATE M BASELINE. Build Bible Phase 5, tasks 04 and 08.",
+    "",
+    "Captured from the live Anchor feed on 2026-10-19, before any migration",
+    "step was taken. This is the record the six directories were serving at",
+    "the moment of cutover, and the only honest thing to diff the generated",
+    "feed against. Do not edit it to make a comparison pass: if the generated",
+    "feed disagrees with this file, the generated feed is what is wrong.",
+    "",
+    "durationSeconds is the itunes:duration from Anchor, converted. Anchor",
+    "reports whole seconds from its own encode; Sanity reports what the",
+    "browser read off the file's metadata at upload. They differ by at most",
+    "one second on four episodes, which is rounding, not a different file.",
+    "enclosureLength is the byte count and is the stronger identity check."
+  ],
+  "source": "https://anchor.fm/s/113747bec/podcast/rss",
+  "capturedAt": "2026-10-19",
+  "episodeCount": 8,
+  "channel": {
+    "title": "Floks Speaks",
+    "language": "en",
+    "itunesAuthor": "Felix Lokko",
+    "itunesOwnerName": "Felix Lokko",
+    "itunesOwnerEmail": "floksspeaks@gmail.com",
+    "itunesCategory": "Religion & Spirituality",
+    "itunesSubcategory": "Christianity",
+    "itunesExplicit": "false",
+    "itunesType": "episodic",
+    "copyright": "Felix Lokko",
+    "link": "https://podcasters.spotify.com/pod/show/floks-speaks"
+  },
+  "episodes": [
+    { "title": "Away For A While",      "guid": "1d18e2bc-e587-46dd-841b-4f0a86811af1", "pubDate": "Fri, 01 May 2026 04:32:00 GMT", "enclosureLength": 3484749, "durationSeconds": 113 },
+    { "title": "Master What You Do",    "guid": "1e7804b9-19e6-4f16-939d-5f5040c60a33", "pubDate": "Fri, 08 May 2026 04:34:00 GMT", "enclosureLength": 3185757, "durationSeconds": 104 },
+    { "title": "I Wish I Were",         "guid": "692dd288-fbeb-4a5a-8e7a-89d38d9acc4f", "pubDate": "Fri, 15 May 2026 04:39:00 GMT", "enclosureLength": 5183277, "durationSeconds": 150 },
+    { "title": "Mekae (I Remember)",    "guid": "7feeeae0-aadd-4d03-a205-8751ed4fdb1b", "pubDate": "Fri, 22 May 2026 04:46:00 GMT", "enclosureLength": 4562925, "durationSeconds": 150 },
+    { "title": "Jesus' Call",           "guid": "9246d43a-e541-4602-b372-fe95703c2dec", "pubDate": "Fri, 29 May 2026 04:48:00 GMT", "enclosureLength": 4167165, "durationSeconds": 130 },
+    { "title": "Education",             "guid": "3f108d64-f577-4970-bc53-128f6275c296", "pubDate": "Fri, 05 Jun 2026 04:51:00 GMT", "enclosureLength": 3129381, "durationSeconds": 95  },
+    { "title": "Ebi Jesus Wey Dey Rule","guid": "b517391b-219e-453d-8ede-19b53e15a3ea", "pubDate": "Fri, 12 Jun 2026 04:01:00 GMT", "enclosureLength": 3566493, "durationSeconds": 106 },
+    { "title": "My Real Gee",           "guid": "f616c1ad-4cf4-410f-9d23-f2d6138a75d9", "pubDate": "Tue, 06 Oct 2026 23:18:46 GMT", "enclosureLength": 5512320, "durationSeconds": 137 }
+  ]
+}
