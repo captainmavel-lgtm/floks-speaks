@@ -47,7 +47,7 @@ export type Collection = {
    * Older documents created before this field existed have no value; treat
    * anything that is not "collection" as a theme.
    */
-  kind?: "theme" | "collection" | null;
+  kind?: "theme" | "collection" | "blog" | null;
   /** Studio override for the chip background. Null means use the fallback. */
   accentColor?: string | null;
   /**

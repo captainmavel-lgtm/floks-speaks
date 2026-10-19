@@ -40,7 +40,7 @@ export default async function Home() {
      has none yet, fall back to the four names the design was built around so
      the section never renders empty. */
   const themeChips = collections
-    .filter((c) => c.kind !== "collection")
+    .filter((c) => c.kind !== "collection" && c.kind !== "blog")
     .map((c) => ({ name: c.title, accentColor: c.accentColor }));
   const chips =
     themeChips.length > 0

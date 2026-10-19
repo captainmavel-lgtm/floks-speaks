@@ -76,8 +76,15 @@ export default async function ListenPage({
      theme is the safe reading, since every collection that predates the
      field is one of the four threads. */
   const isCurated = (c: (typeof collections)[number]) => c.kind === "collection";
+  /* Blog categories are collection documents too — the blogPost schema points
+     its `category` field at this same type. Without this they would surface
+     here as theme chips reading "0 recordings", which is what the stray
+     "Behind The Piece" and "Craft" chips were. */
+  const isBlogCategory = (c: (typeof collections)[number]) => c.kind === "blog";
   const curated = collections.filter(isCurated);
-  const themeChips = collections.filter((c) => !isCurated(c)).map((c) => ({
+  const themeChips = collections
+    .filter((c) => !isCurated(c) && !isBlogCategory(c))
+    .map((c) => ({
     name: c.title,
     accentColor: c.accentColor,
     count: (c.taggedRecordings ?? []).length,
