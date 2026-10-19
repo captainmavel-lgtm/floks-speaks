@@ -42,7 +42,7 @@ export const blogPost = defineType({
       group: "basics",
       options: { hotspot: true },
       description:
-        "Optional. Landscape, around 1600 x 900. If you leave this empty the article uses the author photo instead, and if there is no author photo either it simply runs without a picture.",
+        "Optional. Landscape, around 1600 x 900. Shown at the top of the article page when present; the listing cards never use it, so a piece without one still looks right.",
     }),
     defineField({
       name: "category",
