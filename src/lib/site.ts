@@ -119,8 +119,16 @@ export const CONTACT_EMAIL = "floksspeaks@gmail.com";
  *  logo variant, so a page never has to remember to set both. */
 export const LIGHT_ROUTES = new Set(["/blog", "/contact", "/privacy", "/terms"]);
 
+/** Route prefixes whose children also render on Ivory. An article lives at
+ *  /blog/<slug>, which an exact-match lookup misses — and because every colour
+ *  on that page is a dark-on-light one, missing it rendered the whole article
+ *  as dark text on the dark surface: present in the DOM, invisible on screen. */
+const LIGHT_ROUTE_PREFIXES = ["/blog/"];
+
 export function themeFor(pathname: string): "light" | "dark" {
-  return LIGHT_ROUTES.has(pathname) ? "light" : "dark";
+  if (LIGHT_ROUTES.has(pathname)) return "light";
+  if (LIGHT_ROUTE_PREFIXES.some((p) => pathname.startsWith(p))) return "light";
+  return "dark";
 }
 
 /** Copyright year. Deliberately a constant, not new Date(): a current-year call

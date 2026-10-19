@@ -245,7 +245,11 @@ export default async function Home() {
 
     {/* 05 SCRIPTURE */}
     <section className="border-b border-hairline bg-charcoal">
-      <div className="mx-auto w-full max-w-[56ch] px-(--spacing-gut) py-[clamp(56px,8vw,96px)] text-center">
+      {/* Padding was clamp(56,8vw,96) top and bottom, which on a wide screen
+          put nearly 200px of empty charcoal around six lines of verse. The
+          quote still needs room to breathe — it is a pause between sections —
+          but half as much of it. */}
+      <div className="mx-auto w-full max-w-[56ch] px-(--spacing-gut) py-[clamp(36px,4.5vw,56px)] text-center">
         <blockquote className="font-editorial text-[clamp(1.25rem,2.4vw,1.65rem)] italic leading-[1.55] text-ivory/90">
           &ldquo;Therefore God also has highly exalted Him and given Him the
           name which is above every name, that at the name of Jesus every knee

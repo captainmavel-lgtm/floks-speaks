@@ -82,7 +82,9 @@ export default function Journal({ articles }: { articles: Article[] }) {
 
   return (
     <section>
-      <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-14">
+      {/* py-14 here sat directly under the masthead's own padding, so the
+          two stacked into a long blank band before the first filter chip. */}
+      <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-10">
         <form role="search" onSubmit={(e) => e.preventDefault()} className="mb-7">
           <label
             htmlFor="jq"

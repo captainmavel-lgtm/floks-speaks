@@ -8,7 +8,7 @@ export const instant = false;
 export const metadata: Metadata = {
   title: "Blog",
   description:
-    "Writing between the recordings. Notes on craft, faith, and the things that end up becoming poems.",
+    "Writing between the recordings. Testimonies, poetry, and the work behind the pieces.",
 };
 
 export default async function BlogPage() {
@@ -17,14 +17,14 @@ export default async function BlogPage() {
   return (
     <>
       <section className="border-b border-hairline-ink">
-        <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-16">
+        <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-10">
           <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber-ink">
             Blog
           </p>
           <h1 className="font-editorial text-h1">Writing between the recordings.</h1>
           <p className="mt-5 max-w-[52ch] text-lede leading-[1.7] text-midnight/78">
-            Where a thought needs more than two minutes. Notes on craft, faith,
-            and the things that end up becoming poems.
+            Where a thought needs more than two minutes. Testimonies, poetry,
+            and the work behind the pieces.
           </p>
         </div>
       </section>
