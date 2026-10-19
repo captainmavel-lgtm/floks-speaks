@@ -232,7 +232,15 @@ export const getEvents = unstable_cache(
  */
 export const getSiteSettings = unstable_cache(
   async () => {
-    const query = `*[_type == "siteSettings"][0]`;
+    /* The bare document is projected through so existing fields keep working,
+       with the podcast artwork dereferenced to a URL alongside it. An image
+       field comes back as a reference, and the RSS feed needs a URL it can put
+       straight into itunes:image. Doing it here rather than in the feed keeps
+       the feed builder free of Sanity's shapes. */
+    const query = `*[_type == "siteSettings"][0]{
+      ...,
+      "podcastArtworkUrl": podcastArtwork.asset->url
+    }`;
     return client.fetch(query);
   },
   ["site-settings"],

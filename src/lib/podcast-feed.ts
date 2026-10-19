@@ -180,6 +180,12 @@ export function buildFeed(
       ? s.podcastExplicit
       : FALLBACK.explicit;
 
+  /* Show artwork from Site Settings when it is there, so the cover can be
+     replaced in the Studio without a developer and without a deploy. The
+     fallback is the copy committed to public/, which is what the feed served
+     before this field existed. */
+  const showArtwork = pick("podcastArtworkUrl", FALLBACK.image);
+
   /* Newest first. Directories read top-down and some surface the first item
      as the latest episode regardless of pubDate. */
   const items = recordings.filter(isPlayable).reverse();
@@ -201,7 +207,7 @@ export function buildFeed(
     <itunes:summary>${xml(showDesc)}</itunes:summary>
     <itunes:type>episodic</itunes:type>
     <itunes:explicit>${explicit ? "true" : "false"}</itunes:explicit>
-    <itunes:image href="${xml(FALLBACK.image)}"/>
+    <itunes:image href="${xml(showArtwork)}"/>
     <itunes:owner>
       <itunes:name>${xml(FALLBACK.ownerName)}</itunes:name>
       <itunes:email>${xml(ownerEmail)}</itunes:email>
