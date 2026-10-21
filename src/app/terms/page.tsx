@@ -86,13 +86,6 @@ export default function TermsPage() {
             conversation.
           </p>
 
-          <h2>The newsletter</h2>
-          <p>
-            Subscribing means agreeing to receive an occasional note when new
-            work goes up. You confirm by email first, and you can leave at any
-            time using the link in any message.
-          </p>
-
           <h2>Merchandise</h2>
           <p>
             Shirt orders are arranged through WhatsApp. Price, sizes, payment

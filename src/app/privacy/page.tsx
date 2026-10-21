@@ -31,8 +31,8 @@ export default function PrivacyPage() {
           <p>
             Floks Speaks is a place to listen. You can read the pages and play
             the recordings without telling us anything about yourself. We only
-            hold personal details when you hand them over, which happens in two
-            places: the enquiry form and the newsletter.
+            hold personal details when you hand them over, which happens in one
+            place: the enquiry form.
           </p>
           <p>
             We do not sell anything about you to anyone, and we do not share
@@ -47,13 +47,6 @@ export default function PrivacyPage() {
               and for bookings the optional event date and venue. This reaches
               Floks by email so he can reply. It is used to answer you and
               nothing else.
-            </dd>
-            <dt>The newsletter</dt>
-            <dd>
-              Your email address. We ask you to confirm by clicking a link in a
-              first email, so nobody can sign you up without your knowledge.
-              Every newsletter carries an unsubscribe link, and unsubscribing
-              removes you from the list.
             </dd>
             <dt>Ordering a shirt</dt>
             <dd>
@@ -84,10 +77,6 @@ export default function PrivacyPage() {
               passes them on by email, and filters spam.
             </li>
             <li>
-              <strong>The newsletter service</strong> stores subscriber email
-              addresses and sends the messages.
-            </li>
-            <li>
               <strong>The hosting provider</strong> serves the pages and keeps
               the server logs described above.
             </li>
@@ -107,18 +96,16 @@ export default function PrivacyPage() {
           <h2>How long it is kept</h2>
           <p>
             Enquiry emails are kept while the conversation is useful, and
-            reviewed periodically. Newsletter subscriptions last until you
-            unsubscribe. Server logs are kept for a short period by the hosting
-            provider and then discarded.
+            reviewed periodically. Server logs are kept for a short period by
+            the hosting provider and then discarded.
           </p>
 
           <h2>What you can ask for</h2>
           <p>
             You can ask what we hold about you, ask for it to be corrected, or
-            ask for it to be deleted. You can unsubscribe from the newsletter at
-            any time without asking anyone. Depending on where you live you may
-            have further rights under local law, including the right to complain
-            to a data protection regulator.
+            ask for it to be deleted. Depending on where you live you may have
+            further rights under local law, including the right to complain to a
+            data protection regulator.
           </p>
           <p>
             To make any of these requests, use the{" "}

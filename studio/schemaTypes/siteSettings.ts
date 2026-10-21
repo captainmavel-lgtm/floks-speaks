@@ -18,7 +18,6 @@ export const siteSettings = defineType({
     { name: "nav", title: "Navigation & social" },
     { name: "contact", title: "Contact routing" },
     { name: "podcast", title: "Podcast show metadata" },
-    { name: "newsletter", title: "Newsletter" },
     { name: "seo", title: "SEO defaults" },
   ],
   fields: [
@@ -144,15 +143,6 @@ export const siteSettings = defineType({
       type: "boolean",
       group: "podcast",
       initialValue: false,
-    }),
-
-    // --- Newsletter ---
-    defineField({
-      name: "newsletterIntro",
-      title: "Newsletter signup copy",
-      type: "text",
-      rows: 2,
-      group: "newsletter",
     }),
 
     // --- SEO defaults ---

@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { PlayIcon } from "@/components/icons";
 import EpisodePlayButton from "@/components/episode-play-button";
-import NewsletterForm from "@/components/newsletter-form";
 import {
   THEME_IMAGES,
   formatDuration,
@@ -324,7 +323,7 @@ export default async function Home() {
           </div>
         ) : (
           <p className="m-0 text-[1.0625rem] text-midnight/60">
-            The first piece is being written. Subscribe below and it comes to you.
+            The first piece is being written. It will appear here when it does.
           </p>
         )}
       </div>
@@ -416,22 +415,6 @@ export default async function Home() {
             ))}
           </div>
         </div>
-      </div>
-    </section>
-
-    {/* 09 NEWSLETTER */}
-    <section id="contact" className="border-b border-hairline bg-charcoal">
-      <div className="mx-auto flex w-full max-w-site flex-wrap items-center gap-10 px-(--spacing-gut) py-14">
-        <div className="min-w-0 flex-[1_1_380px]">
-          <h2 className="font-editorial mb-3 text-h2-ed">
-            New words, now and then.
-          </h2>
-          <p className="m-0 max-w-[54ch] text-[1.0625rem] text-ivory/66">
-            A short note when a new piece goes up. Nothing else. Your address
-            goes to nobody.
-          </p>
-        </div>
-        <NewsletterForm inputId="em" />
       </div>
     </section>
     </>
