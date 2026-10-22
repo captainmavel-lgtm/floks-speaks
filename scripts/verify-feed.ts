@@ -226,7 +226,18 @@ async function main() {
   } else {
     console.log("GATE M BLOCKED. Do not point any directory at this feed.");
   }
-  process.exit(failures === 0 ? 0 : 1);
+  /* exitCode rather than exit(). process.exit() tears the process down
+     immediately, and on Windows that can abort mid-teardown while the fetch
+     to Sanity still has a socket open:
+
+       Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), src\win\async.c
+
+     The crash lands after all output, so the result above it is sound, but it
+     looks like a failure to anyone reading the end of the run, which is
+     exactly the wrong impression for a script whose job is to be trusted.
+     Setting exitCode lets Node finish closing its handles and exit on its own
+     with the same status. */
+  process.exitCode = failures === 0 ? 0 : 1;
 }
 
 main();
