@@ -115,7 +115,7 @@ export default async function Home() {
               down again to a text link. The piece is named on the button,
               because "Play" alone asks the reader to take a chance. */}
           {featured?.audioUrl ? (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <div className="flex flex-wrap items-center gap-3.5">
                 <EpisodePlayButton
                   recording={featured}
@@ -130,6 +130,11 @@ export default async function Home() {
                 </Link>
               </div>
 
+              {/* Track facts only. Meet Felix used to sit at the end of this
+                  row, which made a navigation link look like a fourth piece
+                  of metadata: it inherited the muted colour, and on a phone it
+                  wrapped onto its own line behind an orphaned separator. The
+                  two are different kinds of thing and no longer share a row. */}
               <p className="m-0 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.875rem] text-ivory/70">
                 <span className="font-semibold uppercase tracking-[0.12em] text-amber">
                   Featured
@@ -138,14 +143,25 @@ export default async function Home() {
                 <span>{featured.theme}</span>
                 <span aria-hidden="true">&middot;</span>
                 <span>{formatDuration(featured.durationSec)}</span>
-                <span aria-hidden="true">&middot;</span>
-                <Link
-                  href="/about"
-                  className="text-ivory/70 underline decoration-ivory/30 underline-offset-4 transition-colors hover:text-ivory hover:decoration-ivory"
-                >
-                  Meet Felix
-                </Link>
               </p>
+
+              {/* Tertiary, but legible. Full-strength ivory on an amber rule
+                  rather than dimmed text on a dim rule, and tall enough to be
+                  a comfortable tap target. */}
+              <Link
+                href="/about"
+                className="group inline-flex min-h-[44px] items-center gap-2 self-start text-[0.9375rem] font-semibold text-ivory no-underline"
+              >
+                <span className="border-b border-amber/60 pb-1 transition-colors group-hover:border-amber">
+                  Meet Felix
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="text-amber transition-transform duration-200 group-hover:translate-x-0.5"
+                >
+                  &rarr;
+                </span>
+              </Link>
             </div>
           ) : (
             /* No featured audio yet. Rather than show a dead play button, the
