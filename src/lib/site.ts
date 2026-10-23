@@ -118,10 +118,14 @@ export const SHOP_URL =
 export const CONTACT_EMAIL = "info@floksspeaks.org";
 
 /** E.164 for the tel: href, spaced for the eye. One number, two shapes, so a
- *  tap on mobile dials the same line a desktop reader copies down. It is the
- *  same line behind SHOP_URL above. */
-export const CONTACT_PHONE = "+233574845331";
-export const CONTACT_PHONE_DISPLAY = "+233 57 484 5331";
+ *  tap on mobile dials the same line a desktop reader copies down.
+ *
+ *  This is the MTN line, and it is deliberately NOT the number behind
+ *  SHOP_URL above: the shop link stays on the AirtelTigo line because that is
+ *  the one WhatsApp is registered to. Two numbers, two jobs. Changing either
+ *  to match the other breaks the half it was not meant for. */
+export const CONTACT_PHONE = "+233591398502";
+export const CONTACT_PHONE_DISPLAY = "+233 59 139 8502";
 
 /** Which routes render on the Ivory surface. Drives the body data-theme and the
  *  logo variant, so a page never has to remember to set both. */
