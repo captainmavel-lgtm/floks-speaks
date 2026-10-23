@@ -2,16 +2,37 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { JOURNEY } from "@/lib/content";
+import JsonLd from "@/components/json-ld";
+import { ID, breadcrumbLd, graph, pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "About",
   description:
     "Felix Lokko is a Ghanaian Christ-centred spoken word artist. The name, the calling, and how the words found their voice.",
-};
+  path: "/about",
+  image: "/og/og-about.jpg",
+});
 
 export default function AboutPage() {
   return (
     <>
+      {/* ProfilePage tells Google this page is ABOUT the Person node the
+          layout already declares, which is what lets a search for his name
+          surface this page rather than a third-party write-up. */}
+      <JsonLd
+        data={graph(
+          {
+            "@type": "ProfilePage",
+            "@id": `${ID.person}-profile`,
+            mainEntity: { "@id": ID.person },
+            inLanguage: "en-GH",
+          },
+          breadcrumbLd([
+            { name: "Home", path: "/" },
+            { name: "About", path: "/about" },
+          ]),
+        )}
+      />
       {/* 01 WHO IS FLOKS */}
       <section className="relative overflow-hidden border-b border-hairline">
         <div

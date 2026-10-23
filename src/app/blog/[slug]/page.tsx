@@ -6,6 +6,8 @@ import { PortableText } from "@portabletext/react";
 import { getArticleBySlug, getArticles } from "@/lib/sanity-queries";
 import { formatDate } from "@/lib/content";
 import ShareButtons from "@/components/share-buttons";
+import JsonLd from "@/components/json-ld";
+import { blogPostingLd, breadcrumbLd, graph, pageMeta } from "@/lib/seo";
 
 export const instant = false;
 
@@ -18,11 +20,25 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
-  if (!article) return { title: "Not found" };
-  return {
+  /* A slug with no published article 404s in the page below. Telling crawlers
+     not to index the miss stops a mistyped share link becoming a thin page in
+     the index. */
+  if (!article) return { title: "Not found", robots: { index: false } };
+
+  return pageMeta({
     title: article.title,
     description: article.excerpt,
-  };
+    path: `/blog/${slug}`,
+    /* The article's own featured image when it has one. The featured image is
+       optional in the Studio, so the blog card is the fallback rather than a
+       broken reference. */
+    image: article.coverImageUrl || "/og/og-blog.jpg",
+    imageAlt: article.title,
+    type: "article",
+    publishedTime: article.publishedAt,
+    authors: [article.author || "Felix Lokko"],
+    section: article.category,
+  });
 }
 
 /* ---------- portable text rendering ---------- */
@@ -81,6 +97,16 @@ export default async function BlogArticlePage({
 
   return (
     <>
+      <JsonLd
+        data={graph(
+          blogPostingLd(article),
+          breadcrumbLd([
+            { name: "Home", path: "/" },
+            { name: "Blog", path: "/blog" },
+            { name: article.title, path: `/blog/${slug}` },
+          ]),
+        )}
+      />
       {/* HEADER */}
       <section className="border-b border-hairline-ink">
         <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-16">

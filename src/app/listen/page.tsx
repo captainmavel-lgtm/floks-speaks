@@ -16,14 +16,18 @@ import {
 import EpisodePlayButton from "@/components/episode-play-button";
 import Library from "@/components/library";
 import ThemeChips from "@/components/theme-chips";
+import JsonLd from "@/components/json-ld";
+import { breadcrumbLd, graph, pageMeta, podcastSeriesLd } from "@/lib/seo";
 
 export const instant = false;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Listen",
   description:
     "Every Floks Speaks recording in one place. A new piece most weeks. Filter by theme, or search for the line you half remember.",
-};
+  path: "/listen",
+  image: "/og/og-listen.jpg",
+});
 
 /* A theme card on the home page links here as /listen?theme=Faith. Reading the
    query makes this subtree dynamic, so it is isolated here behind Suspense: the
@@ -92,6 +96,18 @@ export default async function ListenPage({
 
   return (
     <>
+      {/* The series and every published episode. Recordings have no page of
+          their own, so each PodcastEpisode anchors to #slug on this page —
+          a real fragment, not an invented URL. */}
+      <JsonLd
+        data={graph(
+          podcastSeriesLd(recordings),
+          breadcrumbLd([
+            { name: "Home", path: "/" },
+            { name: "Listen", path: "/listen" },
+          ]),
+        )}
+      />
       {/* MASTHEAD */}
       <section className="lib-hero relative flex items-end overflow-hidden border-b border-hairline">
         <div className="absolute inset-0">

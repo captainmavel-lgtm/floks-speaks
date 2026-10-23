@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { pageMeta } from "@/lib/seo";
 
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Terms",
   description:
     "Using this site, and using the work. Performing a piece needs no permission. Publishing or selling one does.",
-};
+  path: "/terms",
+});
 
 const UPDATED = "14 October 2026";
 

@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { pageMeta } from "@/lib/seo";
 
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Privacy",
   description:
     "What Floks Speaks keeps, why, and what you can ask for. No advertising or tracking cookies.",
-};
+  path: "/privacy",
+});
 
 /* The date is a constant, not new Date(): a "last updated" that moves on its
    own is worse than no date at all. Change it when the text changes. */

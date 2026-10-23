@@ -5,6 +5,13 @@ import { notFound } from "next/navigation";
 import { formatDuration, formatDate, themeAccent } from "@/lib/content";
 import { getCollectionBySlug } from "@/lib/sanity-queries";
 import EpisodePlayButton from "@/components/episode-play-button";
+import JsonLd from "@/components/json-ld";
+import {
+  breadcrumbLd,
+  collectionPageLd,
+  graph,
+  pageMeta,
+} from "@/lib/seo";
 
 export const instant = false;
 
@@ -29,13 +36,17 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const collection = await getCollectionBySlug(slug);
-  if (!collection) return { title: "Not found" };
-  return {
+  if (!collection) return { title: "Not found", robots: { index: false } };
+
+  return pageMeta({
     title: collection.title,
     description:
       collection.description ??
       `${collection.title} — a collection of spoken word from Floks Speaks.`,
-  };
+    path: `/listen/collection/${slug}`,
+    image: collection.coverImageUrl || "/og/og-listen.jpg",
+    imageAlt: `${collection.title} — Floks Speaks`,
+  });
 }
 
 export default async function CollectionPage({
@@ -57,6 +68,27 @@ export default async function CollectionPage({
 
   return (
     <>
+      <JsonLd
+        data={graph(
+          collectionPageLd({
+            name: collection.title,
+            description:
+              collection.description ??
+              `${collection.title} — a collection of spoken word from Floks Speaks.`,
+            path: `/listen/collection/${slug}`,
+            /* Listed in the order the page renders them: a curated set keeps
+               the order the editor dragged into, a theme falls back to newest
+               first. Numbering them differently here than on screen would
+               make the markup disagree with the page. */
+            items: tracks.map((t) => ({ name: t.title })),
+          }),
+          breadcrumbLd([
+            { name: "Home", path: "/" },
+            { name: "Listen", path: "/listen" },
+            { name: collection.title, path: `/listen/collection/${slug}` },
+          ]),
+        )}
+      />
       {/* HEADER */}
       <section className="border-b border-hairline">
         <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-12">

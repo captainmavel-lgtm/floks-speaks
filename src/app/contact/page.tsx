@@ -1,16 +1,36 @@
 import type { Metadata } from "next";
 import ContactForm from "@/components/contact-form";
 import SocialList from "@/components/social-list";
+import JsonLd from "@/components/json-ld";
+import { ID, abs, breadcrumbLd, graph, pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Contact",
   description:
     "Bookings, collaborations, press, or a thought on something you heard. Share your enquiry and we'll get back to you as soon as possible.",
-};
+  path: "/contact",
+  image: "/og/og-contact.jpg",
+});
 
 export default function ContactPage() {
   return (
     <section>
+      <JsonLd
+        data={graph(
+          {
+            "@type": "ContactPage",
+            "@id": `${abs("/contact")}#contact`,
+            url: abs("/contact"),
+            name: "Contact Floks Speaks",
+            inLanguage: "en-GH",
+            mainEntity: { "@id": ID.org },
+          },
+          breadcrumbLd([
+            { name: "Home", path: "/" },
+            { name: "Contact", path: "/contact" },
+          ]),
+        )}
+      />
       <div className="mx-auto flex w-full max-w-site flex-wrap items-start gap-[clamp(32px,6vw,72px)] px-(--spacing-gut) py-16">
         {/* LEFT */}
         <div className="min-w-0 max-w-[460px] flex-[1_1_340px]">

@@ -12,6 +12,20 @@ import ThemeChips from "@/components/theme-chips";
 
 export const instant = false;
 import { SHOP_URL } from "@/lib/site";
+import JsonLd from "@/components/json-ld";
+import { SITE_DESCRIPTION, breadcrumbLd, graph, pageMeta, podcastSeriesLd } from "@/lib/seo";
+
+/* The home page is the one route whose title must NOT take the layout's
+   "%s · Floks Speaks" template — through it this would read
+   "Floks Speaks · … · Floks Speaks". absoluteTitle opts out. */
+export const metadata = pageMeta({
+  title: "Floks Speaks · Christ-centred spoken word from Felix Lokko",
+  absoluteTitle: true,
+  description: SITE_DESCRIPTION,
+  path: "/",
+  image: "/og/og-default.jpg",
+  imageAlt: "Floks Speaks — Jesus Reigns",
+});
 
 /* ============================================================================
    HOME — Phase 5: wired to Sanity CMS
@@ -48,6 +62,16 @@ export default async function Home() {
 
   return (
     <>
+      {/* The show itself. Organization, Person and WebSite come from the
+          layout; this adds the series those nodes refer to, with its
+          episodes, so a rich result can name the podcast from the home
+          page rather than only from /listen. */}
+      <JsonLd
+        data={graph(
+          podcastSeriesLd(recordings),
+          breadcrumbLd([{ name: "Home", path: "/" }]),
+        )}
+      />
     <section className="hero relative flex items-center overflow-hidden border-b border-hairline">
       <div className="absolute inset-0">
         <Image
