@@ -51,7 +51,11 @@ export default function PlayerSlot() {
       aria-label="Audio player"
       hidden
       className="fixed inset-x-0 bottom-0 z-40"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      /* The inset used to be padding on this slot, which reserved the right
+         amount of space but left the strip below the bar showing the page
+         behind it: on a notched phone that is a band of the wrong colour
+         under the controls. The padding moved inside PlayerBar, where the
+         gradient can paint it. The measured height is unchanged either way. */
     />
   );
 }

@@ -165,7 +165,14 @@ function Scrubber({
         {formatTime(current)}
       </span>
 
-      {/* Track */}
+      {/* Track.
+          The hit area is the padded wrapper, not the 4px bar: a 4px target is
+          unhittable with a thumb, and the negative margin keeps the layout
+          exactly where it was. touch-action:none stops the browser claiming
+          the drag as a page scroll halfway through a seek.
+          The thumb used to be opacity-0 until :hover, which on a touchscreen
+          meant it never appeared at all — the one device where you most need
+          to see what you are dragging. */}
       <div
         ref={barRef}
         role="slider"
@@ -173,27 +180,48 @@ function Scrubber({
         aria-valuemin={0}
         aria-valuemax={Math.round(duration)}
         aria-valuenow={Math.round(current)}
+        aria-valuetext={`${formatTime(current)} of ${formatTime(duration)}`}
         tabIndex={0}
-        className="relative flex-1 h-1 rounded-full cursor-pointer group"
-        style={{ background: "rgba(242,237,229,0.15)" }}
+        className="group relative flex-1 cursor-pointer py-3 -my-3 focus-visible:outline-none"
+        style={{ touchAction: "none" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
         onKeyDown={(e) => {
           if (e.key === "ArrowLeft") onSeek(Math.max(0, current - 5));
           if (e.key === "ArrowRight") onSeek(Math.min(duration, current + 5));
+          if (e.key === "Home") onSeek(0);
+          if (e.key === "End") onSeek(duration);
+          if (e.key === "PageDown") onSeek(Math.max(0, current - 30));
+          if (e.key === "PageUp") onSeek(Math.min(duration, current + 30));
         }}
       >
-        {/* Fill */}
         <div
-          className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-75"
-          style={{ width: `${pct}%`, background: "var(--color-amber)" }}
-        />
-        {/* Thumb */}
-        <div
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-          style={{ left: `${pct}%`, background: "var(--color-amber)" }}
-        />
+          className="relative h-1 rounded-full group-focus-visible:ring-2 group-focus-visible:ring-offset-2"
+          style={{
+            background: "rgba(242,237,229,0.15)",
+            ["--tw-ring-color" as string]: "var(--color-amber)",
+            ["--tw-ring-offset-color" as string]: "var(--color-midnight)",
+          }}
+        >
+          {/* Fill */}
+          <div
+            className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-75"
+            style={{ width: `${pct}%`, background: "var(--color-amber)" }}
+          />
+          {/* Thumb — always visible, and grows while dragged. */}
+          <div
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full transition-[width,height] duration-150"
+            style={{
+              left: `${pct}%`,
+              width: dragging ? "16px" : "12px",
+              height: dragging ? "16px" : "12px",
+              background: "var(--color-amber)",
+              boxShadow: "0 0 0 3px rgba(17,17,22,0.55)",
+            }}
+          />
+        </div>
       </div>
 
       <span className="text-xs tabular-nums" style={{ color: "rgba(242,237,229,0.5)", minWidth: "2.8rem" }}>
@@ -249,6 +277,9 @@ function PlayerBar() {
         borderTop: "1px solid var(--color-hairline)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
+        /* Carried here from the slot so the gradient covers the home-indicator
+           strip instead of stopping short of it. */
+        paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
       {/* Scrubber — full width, sits above the main bar */}
@@ -297,7 +328,7 @@ function PlayerBar() {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-shrink-0 items-center justify-center gap-1 sm:justify-end">
+        <div className="flex flex-shrink-0 items-center justify-center gap-0.5 sm:gap-1 sm:justify-end">
           {/* Previous track. Always enabled: past 3s it restarts the current
               piece, which is the behaviour listeners expect even on track 1.
               Every control in this row is inline-flex centred — a bare inline
@@ -306,7 +337,7 @@ function PlayerBar() {
           <button
             onClick={previous}
             aria-label={hasPrevious ? "Previous recording" : "Restart recording"}
-            className="inline-flex items-center justify-center p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
             style={{ color: "rgba(242,237,229,0.7)", "--tw-ring-color": "var(--color-amber)" } as React.CSSProperties}
           >
             <PrevTrack />
@@ -316,7 +347,7 @@ function PlayerBar() {
           <button
             onClick={() => skip(-15)}
             aria-label="Skip back 15 seconds"
-            className="inline-flex items-center justify-center p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
             style={{ color: "rgba(242,237,229,0.7)", "--tw-ring-color": "var(--color-amber)" } as React.CSSProperties}
           >
             <SkipBack15 />
@@ -327,7 +358,7 @@ function PlayerBar() {
             onClick={isPlaying ? pause : resume}
             disabled={isLoading}
             aria-label={isPlaying ? "Pause" : "Play"}
-            className="w-10 h-10 rounded-full flex items-center justify-center transition-all focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 disabled:opacity-50"
             style={{
               background: "var(--color-amber)",
               color: "var(--color-midnight)",
@@ -341,7 +372,7 @@ function PlayerBar() {
           <button
             onClick={() => skip(15)}
             aria-label="Skip forward 15 seconds"
-            className="inline-flex items-center justify-center p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
             style={{ color: "rgba(242,237,229,0.7)", "--tw-ring-color": "var(--color-amber)" } as React.CSSProperties}
           >
             <SkipForward15 />
@@ -353,7 +384,7 @@ function PlayerBar() {
             onClick={next}
             disabled={!hasNext}
             aria-label="Next recording"
-            className="inline-flex items-center justify-center p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
             style={{ color: "rgba(242,237,229,0.7)", "--tw-ring-color": "var(--color-amber)" } as React.CSSProperties}
           >
             <NextTrack />
@@ -363,7 +394,7 @@ function PlayerBar() {
           <button
             onClick={toggleMute}
             aria-label={muted ? "Unmute" : "Mute"}
-            className="hidden sm:flex p-2 rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
+            className={`${muted ? "flex" : "hidden sm:flex"} h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2`}
             style={{ color: "rgba(242,237,229,0.7)", "--tw-ring-color": "var(--color-amber)" } as React.CSSProperties}
           >
             <VolumeIcon muted={muted} />
@@ -384,9 +415,15 @@ function PlayerBar() {
 
           {/* Dismiss */}
           <button
-            onClick={() => setDismissed(true)}
+            onClick={() => {
+              /* Pause first. Hiding the bar while audio kept playing left a
+                 phone with sound and no controls, and the only way back was
+                 to start a different piece. */
+              pause();
+              setDismissed(true);
+            }}
             aria-label="Close player"
-            className="p-2 rounded-full transition-colors hover:bg-white/10 ml-1 focus-visible:outline-none focus-visible:ring-2"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2"
             style={{ color: "rgba(242,237,229,0.4)", "--tw-ring-color": "var(--color-amber)" } as React.CSSProperties}
           >
             <CloseIcon />

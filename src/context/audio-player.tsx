@@ -92,6 +92,39 @@ export function useAudioPlayer() {
   return ctx;
 }
 
+/* Where the listener was when they last closed the tab. Nothing survived a
+   reload before: a piece abandoned eight minutes in started again from zero,
+   which on a phone over mobile data is the difference between finishing
+   something and giving up on it.
+   Module scope, not component scope, so it is a stable reference rather than
+   a dependency that changes on every render. */
+const RESUME_KEY = "floks:resume";
+
+type Resume = { track: Track; position: number };
+
+function readResume(): Resume | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(RESUME_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Resume;
+    if (!parsed?.track?.audioUrl || typeof parsed.position !== "number") return null;
+    /* A piece that was all but finished is not worth resuming into its last
+       few seconds. */
+    if (
+      parsed.track.durationSeconds &&
+      parsed.position > parsed.track.durationSeconds - 5
+    ) {
+      return null;
+    }
+    return parsed;
+  } catch {
+    /* Private mode, blocked storage, or something else wrote nonsense here.
+       Resuming is a convenience; never let it break playback. */
+    return null;
+  }
+}
+
 // ── Provider ──────────────────────────────────────────────────────────────────
 
 export function AudioPlayerProvider({ children }: { children: React.ReactNode }) {
@@ -122,15 +155,23 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const [muted, setMuted] = useState(false);
 
   /** Load a track into the audio element and start it. Queue-agnostic. */
-  const startTrack = useCallback((t: Track) => {
+  const startTrack = useCallback((t: Track, startAt = 0) => {
     const audio = audioRef.current;
     if (!audio) return;
     setTrack(t);
     setStatus("loading");
-    setCurrentTime(0);
+    setCurrentTime(startAt);
     setDuration(t.durationSeconds ?? 0);
     audio.src = t.audioUrl;
     audio.load();
+    if (startAt > 0) {
+      /* currentTime cannot be set until the browser knows the duration. */
+      const seek = () => {
+        audio.currentTime = startAt;
+        audio.removeEventListener("loadedmetadata", seek);
+      };
+      audio.addEventListener("loadedmetadata", seek);
+    }
     audio.play().catch((err) => {
       console.error("[AudioPlayer] play failed:", err);
       setStatus("error");
@@ -177,6 +218,38 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     audio.addEventListener("ended", onEnded);
     audio.addEventListener("error", onError);
     audio.addEventListener("canplay", onCanPlay);
+
+    /* Restore the last piece, PAUSED and cued to where it was left.
+       Deliberately not resumed: autoplay on load is blocked by every mobile
+       browser worth naming, and sound starting on its own because a page was
+       reopened is hostile even where it is allowed. The listener sees the bar
+       with their place kept and presses play. */
+    /* The rule below would have this read during render, as lazy initial state.
+       That is exactly what it must not do: EpisodePlayButton is a client
+       component rendered on the server, and it reads this status to choose
+       between "Play" and "Resume". Seeding the resumed track during render
+       makes the server say Play and the first client render say Resume,
+       which is a hydration mismatch. Restoring after mount is correct here. */
+    const saved = readResume();
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (saved) {
+      setTrack(saved.track);
+      setQueue([saved.track]);
+      setQueueIndex(0);
+      queueRef.current = [saved.track];
+      indexRef.current = 0;
+      setDuration(saved.track.durationSeconds ?? 0);
+      setCurrentTime(saved.position);
+      audio.src = saved.track.audioUrl;
+      const cue = () => {
+        audio.currentTime = saved.position;
+        audio.removeEventListener("loadedmetadata", cue);
+      };
+      audio.addEventListener("loadedmetadata", cue);
+      audio.load();
+      setStatus("paused");
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     return () => {
       audio.removeEventListener("timeupdate", onTimeUpdate);
@@ -317,6 +390,20 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     safe("seekforward", () => skipRef.current?.(15));
     safe("previoustrack", () => previousRef.current?.());
     safe("nexttrack", () => (hasNextRef.current ? nextRef.current?.() : undefined));
+    /* Without seekto the lock-screen scrubber is drawn but inert: setPositionState
+       below tells the OS where we are, so it renders a draggable bar, and
+       dragging it did nothing. The two have to be registered together. */
+    safe("seekto", ((details: MediaSessionActionDetails) => {
+      const el = audioRef.current;
+      if (!el || typeof details.seekTime !== "number") return;
+      if (details.fastSeek && "fastSeek" in el) {
+        (el as HTMLAudioElement & { fastSeek: (t: number) => void }).fastSeek(
+          details.seekTime,
+        );
+        return;
+      }
+      el.currentTime = details.seekTime;
+    }) as unknown as () => void);
 
     return () => {
       (
@@ -327,6 +414,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
           "seekforward",
           "previoustrack",
           "nexttrack",
+          "seekto",
         ] as MediaSessionAction[]
       ).forEach((a) => safe(a, null));
     };
@@ -354,6 +442,49 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     navigator.mediaSession.playbackState =
       status === "playing" ? "playing" : status === "paused" ? "paused" : "none";
   }, [status]);
+
+  /* Remember the listener's place.
+     Every five seconds rather than on every timeupdate, which fires about
+     four times a second and would mean a synchronous JSON write on each one.
+     pagehide catches the common case the timer misses: closing the tab
+     between ticks. It fires where beforeunload does not, notably when iOS
+     Safari moves a tab to the background. */
+  useEffect(() => {
+    if (!track) return;
+
+    const write = () => {
+      const el = audioRef.current;
+      if (!el) return;
+      const position = el.currentTime;
+      /* The first seconds are not worth restoring into, and a finished piece
+         should start again rather than resume at its last breath. */
+      if (position < 10) return;
+      if (el.duration && position > el.duration - 5) {
+        try {
+          window.localStorage.removeItem(RESUME_KEY);
+        } catch {
+          /* storage unavailable — nothing to clear */
+        }
+        return;
+      }
+      try {
+        window.localStorage.setItem(
+          RESUME_KEY,
+          JSON.stringify({ track, position }),
+        );
+      } catch {
+        /* Private mode or a full quota. Resuming is a convenience. */
+      }
+    };
+
+    const id = window.setInterval(write, 5000);
+    window.addEventListener("pagehide", write);
+    return () => {
+      window.clearInterval(id);
+      window.removeEventListener("pagehide", write);
+      write();
+    };
+  }, [track]);
 
   const skip = useCallback((seconds: number) => {
     const audio = audioRef.current;
