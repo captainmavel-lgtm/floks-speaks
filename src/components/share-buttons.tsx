@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { SocialIcon } from "@/components/icons";
+
 /* ============================================================================
    SHARE BUTTONS — Phase 6
 
@@ -63,9 +65,11 @@ export default function ShareButtons({
         </svg>
       </a>
 
-      {/* Facebook. The mark here was subtly malformed: its closing arc cut a
-          notch out of the bottom of the circle where the stem meets the edge,
-          so at 18px it read as a chipped disc. This is the correct path. */}
+      {/* Facebook. The glyph comes from the shared icon set, the same one the
+          footer's social row draws from, rather than a second copy of the
+          path. The copy that used to live here had a malformed closing arc
+          that bit a notch out of the circle — which is exactly what a
+          duplicated path is for, drifting away from the original unnoticed. */}
       <a
         href={`https://www.facebook.com/sharer/sharer.php?u=${encoded}`}
         target="_blank"
@@ -73,9 +77,7 @@ export default function ShareButtons({
         aria-label="Share on Facebook"
         className="share-btn" data-surface={surface}
       >
-        <svg viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]">
-          <path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 1.093.08 1.372.158v3.325c-.15-.016-.41-.024-.734-.024-1.364 0-1.89.516-1.89 1.859v1.277h3.023l-.52 3.667h-2.503v8.231C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z" />
-        </svg>
+        <SocialIcon id="facebook" className="h-[18px] w-[18px] fill-current" />
       </a>
 
       {/* WhatsApp */}
