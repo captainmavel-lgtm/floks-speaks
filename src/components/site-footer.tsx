@@ -72,8 +72,9 @@ export default function SiteFooter() {
               Words that cut through the noise.
             </p>
             <p className="text-[0.9375rem] leading-[1.7] text-ivory/70">
-              Christian spoken word rooted in faith, inspired by life, and
-              created to point hearts to Jesus. From Accra, Ghana.
+              Spoken word rooted in faith, rhythm, and everyday life. Every
+              piece seeks to reveal Jesus, inspire reflection, and encourage
+              transformation.
             </p>
           </div>
 
@@ -147,7 +148,8 @@ export default function SiteFooter() {
 
         <div className="flex flex-wrap items-center justify-between gap-[18px] border-t border-hairline pt-[26px]">
           <p className="m-0 text-[0.875rem] text-ivory/66">
-            &copy; {COPYRIGHT_YEAR} Floks Speaks. All rights reserved.
+            &copy; {COPYRIGHT_YEAR} Floks Speaks, Accra, Ghana. All rights
+            reserved.
           </p>
           <div className="flex flex-wrap items-center gap-[22px]">
             {UTILITY_NAV.map((n) => (
