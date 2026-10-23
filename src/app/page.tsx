@@ -107,21 +107,65 @@ export default async function Home() {
             Powerful expressions that reveal Jesus and inspire transformation.
           </p>
 
-          <div className="flex flex-wrap gap-3.5">
-            <Link
-              href="/listen"
-              className="inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full bg-amber px-[30px] text-[0.9375rem] font-semibold text-midnight no-underline transition-[background,transform] duration-200 hover:-translate-y-0.5 hover:bg-[#F7BD6E]"
-            >
-              <PlayIcon className="h-[15px] w-[13px] fill-midnight" />
-              Explore Spoken Word
-            </Link>
-            <Link
-              href="/about"
-              className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-edge-ghost-dark px-[30px] text-[0.9375rem] font-semibold text-ivory no-underline transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-ivory"
-            >
-              Meet Felix
-            </Link>
-          </div>
+          {/* One action, not three of equal weight. The hero used to offer
+              Explore and Meet Felix as twin pills, so the most direct thing a
+              visitor could do — hear a piece — was not on offer at all. The
+              amber pill now starts the featured recording in the persistent
+              player, Explore steps down to an outline, and Meet Felix steps
+              down again to a text link. The piece is named on the button,
+              because "Play" alone asks the reader to take a chance. */}
+          {featured?.audioUrl ? (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-wrap items-center gap-3.5">
+                <EpisodePlayButton
+                  recording={featured}
+                  variant="pill"
+                  label={`Play \u201C${featured.title}\u201D`}
+                />
+                <Link
+                  href="/listen"
+                  className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-edge-ghost-dark px-[30px] text-[0.9375rem] font-semibold text-ivory no-underline transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-ivory"
+                >
+                  Explore Spoken Word
+                </Link>
+              </div>
+
+              <p className="m-0 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.875rem] text-ivory/70">
+                <span className="font-semibold uppercase tracking-[0.12em] text-amber">
+                  Featured
+                </span>
+                <span aria-hidden="true">&middot;</span>
+                <span>{featured.theme}</span>
+                <span aria-hidden="true">&middot;</span>
+                <span>{formatDuration(featured.durationSec)}</span>
+                <span aria-hidden="true">&middot;</span>
+                <Link
+                  href="/about"
+                  className="text-ivory/70 underline decoration-ivory/30 underline-offset-4 transition-colors hover:text-ivory hover:decoration-ivory"
+                >
+                  Meet Felix
+                </Link>
+              </p>
+            </div>
+          ) : (
+            /* No featured audio yet. Rather than show a dead play button, the
+               hero falls back to the pair it had before. */
+            <div className="flex flex-wrap gap-3.5">
+              <Link
+                href="/listen"
+                className="inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full bg-amber px-[30px] text-[0.9375rem] font-semibold text-midnight no-underline transition-[background,transform] duration-200 hover:-translate-y-0.5 hover:bg-[#F7BD6E]"
+              >
+                <PlayIcon className="h-[15px] w-[13px] fill-midnight" />
+                Explore Spoken Word
+              </Link>
+              <Link
+                href="/about"
+                className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-edge-ghost-dark px-[30px] text-[0.9375rem] font-semibold text-ivory no-underline transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-ivory"
+              >
+                Meet Felix
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </section>
