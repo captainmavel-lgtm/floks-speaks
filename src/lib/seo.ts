@@ -96,6 +96,15 @@ export function pageMeta({
   absoluteTitle,
 }: PageMetaInput): Metadata {
   const url = abs(path);
+
+  /* The share-card title. Normally the page title plus the site name, since a
+     bare "Listen" in a WhatsApp preview says nothing about whose it is. But
+     absoluteTitle means the title ALREADY names the site, so appending it
+     again produced the doubled "Floks Speaks · … · Floks Speaks" that showed
+     up in a real WhatsApp card. The document <title> had the same bug and was
+     fixed first; these two were missed because they build the suffix
+     separately. */
+  const socialTitle = absoluteTitle ? title : `${title} · ${SITE_NAME}`;
   const img = abs(image || "/og/og-default.jpg");
 
   /* A Sanity-hosted cover is whatever shape the editor uploaded, so no
@@ -117,7 +126,7 @@ export function pageMeta({
     },
     ...(noIndex ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
-      title: `${title} · ${SITE_NAME}`,
+      title: socialTitle,
       description,
       url,
       siteName: SITE_NAME,
@@ -141,7 +150,7 @@ export function pageMeta({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title} · ${SITE_NAME}`,
+      title: socialTitle,
       description,
       images: [img],
     },
