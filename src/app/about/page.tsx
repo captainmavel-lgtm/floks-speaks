@@ -91,19 +91,18 @@ export default function AboutPage() {
           </h2>
           <ol className="road">
             {JOURNEY.map((m) => (
-              <li
-                key={m.date}
-                className={`step${m.major ? " is-major" : ""}`}
-                data-date={m.date}
-              >
-                {m.kind && <p className="kind">{m.kind}</p>}
+              <li key={m.date} className={`step${m.major ? " is-major" : ""}`}>
+                {/* Date first. The kind chip used to lead, so someone
+                    scanning for chronology met a lilac pill before the year.
+                    data-date went with it: nothing read the attribute. */}
                 <p className="yr">{m.label}</p>
+                {m.kind && <p className="kind">{m.kind}</p>}
                 <h3>{m.heading}</h3>
                 <p className="body">{m.body}</p>
                 {m.link && (
                   <Link
                     href={m.link.href}
-                    className="mt-2.5 inline-block border-b border-amber-deep/45 pb-0.5 text-[0.875rem] text-amber-ink"
+                    className="mt-2 inline-flex min-h-[44px] items-center border-b border-amber-deep/45 text-[0.875rem] text-amber-ink"
                   >
                     {m.link.label}
                   </Link>

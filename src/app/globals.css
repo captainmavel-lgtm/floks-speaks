@@ -215,24 +215,73 @@ a[class*="btn"] {
 .road {
   list-style: none;
   margin: 0;
-  padding: 0;
+  /* Room for the rail and its markers. */
+  padding: 0 0 0 30px;
   max-width: 760px;
+  position: relative;
+}
+
+/* The rail. The comment above this block has described a marker since the
+   timeline was written, but no ::before ever existed: eight milestones
+   rendered as eight undifferentiated paragraphs with nothing anchoring the
+   left edge, so "where am I in this story" could not be answered at a glance.
+   It fades out at the foot because the journey has not finished. */
+.road::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 10px;
+  bottom: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(198, 118, 13, 0.5) 0%,
+    rgba(17, 17, 22, 0.2) 18%,
+    rgba(17, 17, 22, 0.2) 92%,
+    rgba(17, 17, 22, 0) 100%
+  );
 }
 
 .step {
   position: relative;
-  padding: 0 0 36px;
+  padding: 0 0 30px;
+}
+
+/* The marker. Pulled back out to the rail: .road's 30px of padding means
+   -30px from the step's content box is the rail's own left edge. */
+.step::before {
+  content: "";
+  position: absolute;
+  left: -30px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--color-ivory, #f2ede5);
+  border: 2px solid rgba(17, 17, 22, 0.3);
+}
+
+/* A major milestone used to differ by one pixel of heading size, which nobody
+   has ever perceived as hierarchy. It now reads as a stop on the line. */
+.step.is-major::before {
+  background: var(--color-amber-deep);
+  border-color: var(--color-amber-deep);
+  box-shadow: 0 0 0 4px rgba(198, 118, 13, 0.15);
 }
 
 .step:last-child {
   padding-bottom: 0;
 }
+
+/* The date is the one thing a reader scans a timeline for, and it was the
+   smallest, faintest element in every entry. */
 .step .yr {
-  margin: 0 0 6px;
-  font-size: 0.75rem;
-  letter-spacing: 0.14em;
+  margin: 0 0 4px;
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(17, 17, 22, 0.6);
+  color: rgba(17, 17, 22, 0.72);
   font-weight: 600;
   /* dates line up down the rail */
   font-variant-numeric: tabular-nums;
@@ -245,12 +294,13 @@ a[class*="btn"] {
 .step h3 {
   margin: 0 0 6px;
   font-family: var(--font-display);
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   font-weight: 600;
+  line-height: 1.35;
 }
 
 .step.is-major h3 {
-  font-size: 1.1875rem;
+  font-size: 1.25rem;
 }
 
 .step .kind {
@@ -272,6 +322,30 @@ a[class*="btn"] {
   line-height: 1.7;
   color: rgba(17, 17, 22, 0.74);
   max-width: 62ch;
+}
+
+/* Phones. The section ran close to 3,000px of continuous prose at 390px, and
+   the only lever that does not touch Felix's words is the rhythm they are set
+   in. Smaller body, tighter leading, less air between entries: around a fifth
+   off the height, and the rail now does the work the whitespace was failing
+   to do. */
+@media (max-width: 640px) {
+  .road {
+    padding-left: 26px;
+  }
+  .step {
+    padding-bottom: 24px;
+  }
+  .step::before {
+    left: -26px;
+  }
+  .step .body {
+    font-size: 0.9375rem;
+    line-height: 1.62;
+  }
+  .step.is-major h3 {
+    font-size: 1.1875rem;
+  }
 }
 
 /* ============================================================================
