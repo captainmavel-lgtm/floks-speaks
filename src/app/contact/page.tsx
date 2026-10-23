@@ -77,7 +77,7 @@ export default function ContactPage() {
               links, so a phone dials and a desktop opens a mail client. */}
           <div className="mb-7 border-t border-hairline-ink pt-[26px]">
             <p className="mb-3.5 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber-ink">
-              Let&apos;s connect
+              Reach out directly
             </p>
             <ul className="m-0 flex list-none flex-col gap-3 p-0">
               <li className="flex items-center gap-3">
