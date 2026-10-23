@@ -134,12 +134,16 @@ export default function SiteFooter() {
 
           <Rule />
 
-          <div className="col-span-2 min-w-0 lg:flex-[1_1_240px]">
+          <div className="col-span-2 min-w-0 lg:flex-[1_1_280px]">
             <p className="mb-3.5 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-amber">
               Follow the journey
             </p>
-            {/* surface is explicit, never inherited. See the header comment. */}
-            <SocialList surface="dark" />
+            {/* surface is explicit, never inherited. See the header comment.
+                flex-nowrap because the five icons need 270px and the column
+                was being squeezed to 255px at tablet-landscape widths, which
+                dropped the last icon onto a line of its own. The 280px basis
+                above is what keeps nowrap from overflowing instead. */}
+            <SocialList surface="dark" className="flex-nowrap" />
             <p className="mt-3.5 text-[0.875rem] leading-[1.6] text-ivory/66">
               New spoken word, creative moments, and stories behind the words.
             </p>
