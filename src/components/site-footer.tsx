@@ -82,14 +82,15 @@ export default function SiteFooter() {
             </div>
           </nav>
 
-          {/* Reach him sits before Follow: an address and a number are a way
+          {/* The contact column sits before Follow: an address and a number
+              are a way
               to start a conversation, a feed is a way to keep one going. Both
               pin their own colour onto Midnight rather than inheriting it,
               which is the rule the header comment sets out. The email is left
               to wrap on a narrow screen rather than overflow the column. */}
           <div className="min-w-0 flex-[1_1_220px]">
             <p className="mb-3.5 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-ivory/66">
-              Reach him
+              Reach out directly
             </p>
             <div className="flex flex-col gap-2.5">
               <a
