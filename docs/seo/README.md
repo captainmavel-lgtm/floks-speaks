@@ -103,6 +103,49 @@ post or a collection uses its own cover image instead
 when it has one, and falls back to the section card
 when it does not.
 
+## Share cards for CMS-backed pages
+
+A collection or an article uses its own cover image as
+the card. That image never goes to a scraper raw. It
+goes through `socialImage()` in `src/lib/seo.ts`, which
+rewrites a Sanity CDN URL to ask for 1200x630 JPEG at
+quality 80, landing around 100 to 150KB.
+
+This was found the hard way.
+`/listen/collection/the-wait` had correct og:title,
+og:description and og:url and still produced no
+WhatsApp preview at all. The cause was og:image
+pointing straight at the Sanity asset: a 1254x1254 PNG.
+Two faults in one tag. A PNG that size runs to
+megabytes, and WhatsApp drops a preview entirely above
+its size limit rather than degrading it, so the card
+vanished with nothing in the markup to explain why. And
+it is square, under a twitter:card of
+summary_large_image, which expects 1.91:1.
+
+Both are fixed at the CDN, so nothing needs re-uploading
+and no build step is involved.
+
+The transform runs inside `pageMeta`, not at the call
+sites. That is deliberate: any page added later gets a
+correctly sized card without its author knowing this
+problem exists. Favicons and the manifest already work
+this way, since they come from the root layout and the
+file conventions and apply to every route.
+
+`fit=crop` rather than `fit=fill`. Filling pads a square
+out to 1.91:1 with bars down both sides, which hands two
+thirds of the card to padding. A centre crop fills the
+frame. The trade is that cover art with text near its
+top or bottom edge can lose it. The fix for that one
+item is a dedicated landscape image, not a different
+default here.
+
+Worth knowing: re-uploading the square cover at a larger
+size or a smaller file size does not help either fault.
+Size is already handled at delivery, and shape is not a
+function of resolution.
+
 ## Structured data
 
 One `@graph` block per page rather than several script

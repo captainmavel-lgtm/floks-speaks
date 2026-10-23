@@ -59,6 +59,56 @@ export function abs(path: string): string {
 /*  Page metadata                                                            */
 /* ------------------------------------------------------------------------ */
 
+/** Open Graph's landscape card. Every scraper renders this ratio without
+ *  letterboxing, and `twitter:card: summary_large_image` assumes it. */
+export const SOCIAL_W = 1200;
+export const SOCIAL_H = 630;
+
+/**
+ * Turn any image into a share card that scrapers will actually render.
+ *
+ * This exists because of a real failure. /listen/collection/the-wait had
+ * correct og:title, og:description and og:url, and still produced no WhatsApp
+ * preview at all. The reason was the image: og:image pointed straight at the
+ * Sanity asset, a 1254x1254 PNG. Two things wrong with that.
+ *
+ *   1. Size. A PNG at that resolution runs to megabytes. WhatsApp drops the
+ *      preview entirely above its size limit rather than degrading, so the
+ *      card silently vanishes with nothing in the markup to explain it.
+ *   2. Shape. It is square, under a twitter:card of summary_large_image,
+ *      which expects 1.91:1. Square art there gets cropped unpredictably or
+ *      refused outright.
+ *
+ * Sanity's CDN takes transform parameters on the URL, so both are fixed at
+ * the source with no re-upload and no build step: ask for 1200x630, JPEG,
+ * quality 80. That lands around 100-150KB.
+ *
+ * fit=crop rather than fit=fill. Filling would pad a square out to 1.91:1
+ * with bars down both sides, which is two thirds of the card given over to
+ * padding and reads as a mistake rather than a choice. A centre crop fills
+ * the frame. The trade is that cover art with text near its top or bottom
+ * edge can lose it; the fix for that one collection is a dedicated landscape
+ * image in the Studio, not a different default here.
+ *
+ * Anything not on the Sanity CDN is returned untouched: the generated cards
+ * in /og are already the right size and shape.
+ */
+export function socialImage(image: string): string {
+  const url = abs(image);
+  if (!url.includes("cdn.sanity.io")) return url;
+
+  const [base] = url.split("?");
+  const q = new URLSearchParams({
+    w: String(SOCIAL_W),
+    h: String(SOCIAL_H),
+    fit: "crop",
+    crop: "center",
+    fm: "jpg",
+    q: "80",
+  });
+  return `${base}?${q.toString()}`;
+}
+
 export type PageMetaInput = {
   title: string;
   description: string;
@@ -105,13 +155,7 @@ export function pageMeta({
      fixed first; these two were missed because they build the suffix
      separately. */
   const socialTitle = absoluteTitle ? title : `${title} · ${SITE_NAME}`;
-  const img = abs(image || "/og/og-default.jpg");
-
-  /* A Sanity-hosted cover is whatever shape the editor uploaded, so no
-     width/height is claimed for it. Declaring 1200x630 for an image that is
-     actually square makes LinkedIn letterbox it. The generated cards are the
-     only ones whose dimensions are known. */
-  const isOwnCard = img.includes("/og/og-");
+  const img = socialImage(image || "/og/og-default.jpg");
 
   return {
     title: absoluteTitle ? { absolute: title } : title,
@@ -135,7 +179,11 @@ export function pageMeta({
       images: [
         {
           url: img,
-          ...(isOwnCard ? { width: 1200, height: 630 } : {}),
+          /* Always safe to declare now: socialImage guarantees every card is
+             1200x630, whatever shape the editor uploaded. */
+          width: SOCIAL_W,
+          height: SOCIAL_H,
+          type: "image/jpeg",
           alt: imageAlt || `${title} — ${SITE_NAME}`,
         },
       ],
