@@ -65,19 +65,19 @@ export default function ContactPage() {
                 Share your enquiry and we&apos;ll get back to you as soon as possible.
               </p>
               <p className="m-0 text-[0.9375rem] leading-[1.6] text-midnight/68">
-                Including the ones that turn into a no. Bookings move fastest
-                when the date and venue come with the message.
+                Bookings move fastest when the date and venue come with the
+                message.
               </p>
             </div>
           </div>
 
-          {/* Direct lines sit above the socials and below the form promise:
+          {/* The contact lines sit above the socials and below the form promise:
               a reader who does not want a form should find the address and the
               number before they are offered a feed to follow. Both are real
               links, so a phone dials and a desktop opens a mail client. */}
           <div className="mb-7 border-t border-hairline-ink pt-[26px]">
             <p className="mb-3.5 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber-ink">
-              Direct lines
+              Let&apos;s connect
             </p>
             <ul className="m-0 flex list-none flex-col gap-3 p-0">
               <li className="flex items-center gap-3">
@@ -127,7 +127,7 @@ export default function ContactPage() {
               prop is required. */}
           <div className="border-t border-hairline-ink pt-[26px]">
             <p className="mb-3.5 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber-ink">
-              Or find him here
+              Follow the journey
             </p>
             <SocialList surface="ink" />
           </div>
