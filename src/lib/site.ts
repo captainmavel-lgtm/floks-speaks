@@ -112,8 +112,16 @@ export const SHOP_URL =
   encodeURIComponent("Hello, I would like to order a Floks Speaks T-shirt.");
 
 /** All enquiries route here with the enquiry type in the subject line,
- *  per Build Bible section 01 item 20. */
-export const CONTACT_EMAIL = "floksspeaks@gmail.com";
+ *  per Build Bible section 01 item 20. The branded address is the public one;
+ *  the original Gmail account stays the podcast feed owner because Apple
+ *  verifies ownership against the address the show was claimed with. */
+export const CONTACT_EMAIL = "info@floksspeaks.org";
+
+/** E.164 for the tel: href, spaced for the eye. One number, two shapes, so a
+ *  tap on mobile dials the same line a desktop reader copies down. It is the
+ *  same line behind SHOP_URL above. */
+export const CONTACT_PHONE = "+233574845331";
+export const CONTACT_PHONE_DISPLAY = "+233 57 484 5331";
 
 /** Which routes render on the Ivory surface. Drives the body data-theme and the
  *  logo variant, so a page never has to remember to set both. */

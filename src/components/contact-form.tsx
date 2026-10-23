@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 
+import { CONTACT_EMAIL } from "@/lib/site";
+
 /* ============================================================================
    CONTACT FORM
 
@@ -213,10 +215,10 @@ export default function ContactForm() {
           <p className="m-0 mt-1 text-[0.9375rem] text-midnight/72">
             Email Floks directly at{" "}
             <a
-              href="mailto:floksspeaks@gmail.com"
+              href={`mailto:${CONTACT_EMAIL}`}
               className="text-amber-ink underline underline-offset-2"
             >
-              floksspeaks@gmail.com
+              {CONTACT_EMAIL}
             </a>{" "}
             and he will pick it up there.
           </p>

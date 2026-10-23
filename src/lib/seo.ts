@@ -20,7 +20,12 @@
    ========================================================================= */
 
 import type { Metadata } from "next";
-import { CONTACT_EMAIL, PLATFORMS, SOCIALS } from "./site";
+import {
+  CONTACT_EMAIL,
+  CONTACT_PHONE,
+  PLATFORMS,
+  SOCIALS,
+} from "./site";
 
 export const SITE_URL = "https://floksspeaks.org";
 export const SITE_NAME = "Floks Speaks";
@@ -232,6 +237,7 @@ export function organizationLd() {
     alternateName: "Floks Speaks · Jesus Reigns",
     url: SITE_URL,
     email: CONTACT_EMAIL,
+    telephone: CONTACT_PHONE,
     description: SITE_DESCRIPTION,
     logo: {
       "@type": "ImageObject",
@@ -247,6 +253,17 @@ export function organizationLd() {
       "@type": "PostalAddress",
       addressLocality: "Accra",
       addressCountry: "GH",
+    },
+    /* A contactPoint repeats the address and number in the shape Google reads
+       for a knowledge panel. The bare email and telephone fields above stay:
+       other consumers only look there. */
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "Bookings and enquiries",
+      email: CONTACT_EMAIL,
+      telephone: CONTACT_PHONE,
+      areaServed: "Worldwide",
+      availableLanguage: ["en"],
     },
     sameAs: PROFILE_URLS,
   };

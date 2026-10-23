@@ -1,6 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
-import { NAV, UTILITY_NAV, SHOP_URL, COPYRIGHT_YEAR } from "@/lib/site";
+import {
+  NAV,
+  UTILITY_NAV,
+  SHOP_URL,
+  COPYRIGHT_YEAR,
+  CONTACT_EMAIL,
+  CONTACT_PHONE,
+  CONTACT_PHONE_DISPLAY,
+} from "@/lib/site";
 import SocialList from "@/components/social-list";
 
 /* ============================================================================
@@ -73,6 +81,34 @@ export default function SiteFooter() {
               </a>
             </div>
           </nav>
+
+          {/* Reach him sits before Follow: an address and a number are a way
+              to start a conversation, a feed is a way to keep one going. Both
+              pin their own colour onto Midnight rather than inheriting it,
+              which is the rule the header comment sets out. The email is left
+              to wrap on a narrow screen rather than overflow the column. */}
+          <div className="min-w-0 flex-[1_1_220px]">
+            <p className="mb-3.5 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-ivory/66">
+              Reach him
+            </p>
+            <div className="flex flex-col gap-2.5">
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="break-words text-[0.9375rem] text-ivory/72 no-underline transition-colors hover:text-amber"
+              >
+                {CONTACT_EMAIL}
+              </a>
+              <a
+                href={`tel:${CONTACT_PHONE}`}
+                className="text-[0.9375rem] tabular-nums text-ivory/72 no-underline transition-colors hover:text-amber"
+              >
+                {CONTACT_PHONE_DISPLAY}
+              </a>
+            </div>
+            <p className="mt-3.5 text-[0.875rem] text-ivory/66">
+              Accra, Ghana. GMT, no daylight saving.
+            </p>
+          </div>
 
           <div className="flex-[1_1_240px]">
             <p className="mb-3.5 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-ivory/66">
