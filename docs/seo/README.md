@@ -12,10 +12,11 @@ a human to finish it.
 | `src/app/sitemap.ts` | `/sitemap.xml` | Static routes plus live collections and articles from Sanity |
 | `src/app/robots.ts` | `/robots.txt` | Crawl rules, feed-safe, closed on non-production builds |
 | `src/app/manifest.ts` | `/manifest.webmanifest` | Installable on a phone home screen |
-| `src/app/icon.svg` | `/icon.svg` | Scalable favicon |
-| `src/app/favicon.ico` | `/favicon.ico` | 16, 32 and 48px favicon |
-| `src/app/apple-icon.png` | `/apple-icon.png` | 180px iOS home-screen icon |
-| `public/icons/*` | `/icons/*` | 192, 512 and maskable icons for the manifest |
+| `src/app/icon.svg` | `/icon.svg` | Scalable favicon, reduced mark |
+| `src/app/favicon.ico` | `/favicon.ico` | 16, 32 and 48px favicon, reduced mark |
+| `src/app/apple-icon.png` | `/apple-icon.png` | 180px iOS home-screen icon, artwork |
+| `public/icons/*` | `/icons/*` | 192, 512 and maskable, artwork |
+| `public/brand/icon-art-1200.jpg` | n/a | Master the large icons are cut from |
 | `public/og/*.jpg` | `/og/*.jpg` | 1200x630 share cards |
 
 ## The one thing that was actually broken
@@ -27,32 +28,57 @@ rather than Felix's.
 
 ## The icon mark
 
-The app icon is the wordmark's own speech bubble with
-an F knocked out of it, Ivory on Midnight. It is not an
-invented shape. The logo already builds the bubble as a
-filled block with "speaks" reversed out, and the icon
-keeps that construction, cropped to the one letter that
-survives at 16 pixels.
+Two marks, each used only where it works.
 
-The full wordmark is not used as an icon because it is
-roughly 3:1. Set into a square at 16px, each letter
+**Large sizes, 180px and up.** The podcast artwork
+itself: apple-icon, and the 192, 512 and maskable
+manifest icons. Cut from
+`public/brand/icon-art-1200.jpg`, which is kept in the
+repo so the set can be regenerated without hunting for
+the file.
+
+Note this is NOT the same image as
+`public/podcast-cover-3000.jpg`. It is a slightly
+tighter crop with a warmer floor. The podcast feed
+artwork is deliberately left alone, because podcast
+directories are mid-migration and poll that file.
+
+**Small sizes, below about 128px.** A reduced mark: the
+wordmark's own speech bubble with an F knocked out of
+it, Ivory on Midnight. Used for `favicon.ico` and
+`icon.svg`.
+
+The reduced mark exists because the artwork cannot do
+this job. Shrunk to 16px the chrome wordmark collapses
+into a blue smear over an orange blur. The bubble is
+not an invented shape: the logo already draws it as a
+filled block with "speaks" reversed out, and the mark
+keeps that construction, cropped to the one letter that
+survives.
+
+The full wordmark is never used as an icon at any size.
+At roughly 3:1, set into a square at 16px, each letter
 lands under two pixels wide.
 
-Colours are the logo pair as it appears on the dark
-site. No third colour is introduced. The Amber floor
-glow is the podcast artwork's, and it is dropped at
-favicon sizes where it would only soften the edge.
+**The maskable one is not just the artwork.** Android
+crops to a circle inscribed in the middle 80%, and the
+wordmark runs nearly edge to edge, so full-bleed art
+loses "FLOKS" and "aks" to the crop. The artwork is
+scaled to 78% and the surround filled with a blurred,
+darkened copy of itself, feathered at the join. There
+is no seam to see, the field stays in the art's own
+colours, and the crop lands on empty glow instead of
+letterforms. A first attempt padded with a colour
+sampled from the corners and came out framed in purple,
+because the top-left corner is the nebula.
 
-Source of truth is `public/brand/logo-ivory.svg` and
-`logo-navy.svg`. Those are vector and already carry the
-brand colours, which is why they beat both the PDF
-master (black, needs recolouring) and any PNG export
-(raster, falls apart above 600px).
+PNGs are run through pngquant. The 512 went from 290KB
+to 94KB with no visible banding in the gradients.
 
 ## The share cards
 
-Built from `public/podcast-cover-3000.jpg`, the real
-finished artwork, cropped to a centred 1.91:1 band.
+Built from `public/podcast-cover-3000.jpg`, the 3000px
+master, cropped to a centred 1.91:1 band.
 That ratio is what Open Graph and X both render without
 letterboxing, and the crop keeps the wordmark, the
 waveform and the floor light.
@@ -65,6 +91,12 @@ Cards are JPEG at quality 86, about 97KB each. PNG cost
 roughly 700KB for no visible gain on photographic
 artwork, and several scrapers give a card image a short
 fetch budget.
+
+A square image padded into a 1200x630 frame was the
+alternative and was rejected: it leaves roughly 70% of
+the card near-black with the art shoved to one side,
+which reads as a broken image rather than a design.
+Cropping a band out of the artwork fills the frame.
 
 Per-section cards carry an Amber eyebrow label. A blog
 post or a collection uses its own cover image instead
