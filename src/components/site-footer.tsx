@@ -28,7 +28,27 @@ import SocialList from "@/components/social-list";
    Every child that carries colour pins its own too. SocialList takes an
    explicit `surface` prop rather than reading the page theme, which is what
    makes the v30 defect structurally impossible here.
+
+   LAYOUT. Two shapes from one tree, switching at lg:
+
+     mobile   brand, rule, [Explore | Reach out] side by side, rule,
+              Follow full width, rule, copyright
+     desktop  the four blocks in one row, no rules between them
+
+   The rules are real elements rather than borders on the blocks, because a
+   border on a block would have to be switched off again at lg on three
+   separate children and one of them would eventually be missed.
    ========================================================================= */
+
+/** The footer says About Floks and Shop where the header says About and Shop
+ *  T-shirts. The header is a navigation bar and wants the shortest label that
+ *  still reads; the footer is a sitemap and can afford the longer one. Kept
+ *  here rather than in NAV so the header is not dragged along. */
+const FOOTER_LABEL: Record<string, string> = { "/about": "About Floks" };
+
+function Rule() {
+  return <div className="col-span-2 my-8 border-t border-hairline lg:hidden" />;
+}
 
 export default function SiteFooter() {
   return (
@@ -39,8 +59,8 @@ export default function SiteFooter() {
       }}
     >
       <div className="mx-auto w-full max-w-site px-(--spacing-gut)">
-        <div className="mb-9 flex flex-wrap gap-10">
-          <div className="min-w-0 flex-[1_1_280px]">
+        <div className="mb-9 grid grid-cols-2 gap-x-8 lg:flex lg:flex-wrap lg:gap-10">
+          <div className="col-span-2 min-w-0 lg:flex-[1_1_280px]">
             <Image
               src="/brand/logo-ivory.svg"
               alt="Floks Speaks"
@@ -52,12 +72,15 @@ export default function SiteFooter() {
               Words that cut through the noise.
             </p>
             <p className="text-[0.9375rem] leading-[1.7] text-ivory/70">
-              Christian spoken word from Accra, Ghana. New pieces most weeks.
+              Christian spoken word rooted in faith, inspired by life, and
+              created to point hearts to Jesus. From Accra, Ghana.
             </p>
           </div>
 
-          <nav className="flex-[0_1_180px]" aria-label="Footer">
-            <p className="mb-3.5 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-ivory/66">
+          <Rule />
+
+          <nav className="min-w-0 lg:flex-[0_1_180px]" aria-label="Footer">
+            <p className="mb-3.5 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-amber">
               Explore
             </p>
             <div className="flex flex-col gap-2.5">
@@ -67,7 +90,7 @@ export default function SiteFooter() {
                   href={n.href}
                   className="text-[0.9375rem] text-ivory/72 no-underline hover:text-ivory"
                 >
-                  {n.label}
+                  {FOOTER_LABEL[n.href] ?? n.label}
                 </Link>
               ))}
               <a
@@ -77,19 +100,19 @@ export default function SiteFooter() {
                 aria-label="Shop T-shirts, opens WhatsApp in a new tab"
                 className="text-[0.9375rem] text-ivory/72 no-underline hover:text-ivory"
               >
-                Shop T-shirts
+                Shop
               </a>
             </div>
           </nav>
 
           {/* The contact column sits before Follow: an address and a number
-              are a way
-              to start a conversation, a feed is a way to keep one going. Both
-              pin their own colour onto Midnight rather than inheriting it,
-              which is the rule the header comment sets out. The email is left
-              to wrap on a narrow screen rather than overflow the column. */}
-          <div className="min-w-0 flex-[1_1_220px]">
-            <p className="mb-3.5 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-ivory/66">
+              are a way to start a conversation, a feed is a way to keep one
+              going. Both pin their own colour onto Midnight rather than
+              inheriting it, which is the rule the header comment sets out.
+              The email is left to wrap on a narrow screen rather than
+              overflow the column. */}
+          <div className="min-w-0 lg:flex-[1_1_220px]">
+            <p className="mb-3.5 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-amber">
               Reach out directly
             </p>
             <div className="flex flex-col gap-2.5">
@@ -108,14 +131,16 @@ export default function SiteFooter() {
             </div>
           </div>
 
-          <div className="flex-[1_1_240px]">
-            <p className="mb-3.5 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-ivory/66">
-              Follow
+          <Rule />
+
+          <div className="col-span-2 min-w-0 lg:flex-[1_1_240px]">
+            <p className="mb-3.5 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-amber">
+              Follow the journey
             </p>
             {/* surface is explicit, never inherited. See the header comment. */}
             <SocialList surface="dark" />
-            <p className="mt-3.5 text-[0.875rem] text-ivory/66">
-              New pieces and behind the scenes.
+            <p className="mt-3.5 text-[0.875rem] leading-[1.6] text-ivory/66">
+              New spoken word, creative moments, and stories behind the words.
             </p>
           </div>
         </div>
