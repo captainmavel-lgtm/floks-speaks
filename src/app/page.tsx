@@ -211,7 +211,7 @@ export default async function Home() {
           {latest.map((r) => (
             <article
               key={r._id}
-              className="rounded-2xl border border-hairline bg-charcoal p-4 shadow-[0_2px_8px_rgba(0,0,0,.28)] transition-colors duration-200 hover:border-amber/55"
+              className="group relative rounded-2xl border border-hairline bg-charcoal p-4 shadow-[0_2px_8px_rgba(0,0,0,.28)] transition-colors duration-200 hover:border-amber/55 has-[a:focus-visible]:border-amber"
             >
               {r.coverImageUrl && (
               <Image
@@ -226,15 +226,25 @@ export default async function Home() {
               <p className="mb-2 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-lilac">
                 {r.theme}
               </p>
+              {/* The title used to point at /listen, because the piece had
+                  no page of its own to point at. It does now, and the link
+                  stretches over the whole card: its ::after covers the art,
+                  the meta and the padding, so anywhere that is not the play
+                  button opens the piece. */}
               <h3 className="font-display mb-3 text-[1.125rem] font-semibold leading-[1.3]">
-                <Link href="/listen" className="text-ivory no-underline">
+                <Link
+                  href={`/listen/${r.slug}`}
+                  className="text-ivory no-underline transition-colors after:absolute after:inset-0 after:content-[''] group-hover:text-amber focus-visible:outline-none"
+                >
                   {r.title}
                 </Link>
               </h3>
               <div className="flex items-center gap-3">
                 {/* The three latest, in the order shown. The featured pill
                     above stays a one-off: it is a highlight, not a list. */}
-                <EpisodePlayButton recording={r} variant="icon" queue={latest} />
+                <span className="relative z-10">
+                  <EpisodePlayButton recording={r} variant="icon" queue={latest} />
+                </span>
                 <span className="text-[0.8125rem] text-ivory/66">
                   {formatDuration(r.durationSec)} &middot;{" "}
                   {formatDate(r.publishedAt)}

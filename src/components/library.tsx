@@ -132,17 +132,20 @@ export default function Library({
 
         {shown.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {/* The whole card opens the piece, the way a collection card
+                opens a collection. It cannot simply be wrapped in a Link,
+                because it contains the play button, and a button inside a
+                link is neither valid nor operable by keyboard. So the title
+                link stretches: its ::after covers the card, which makes the
+                art, the summary and the empty space all part of that one
+                link. The play button is lifted above the overlay and keeps
+                working as a button. */}
             {shown.map((r) => (
               <article
                 key={r._id}
-                className="overflow-hidden rounded-2xl border border-hairline bg-charcoal"
+                className="group relative overflow-hidden rounded-2xl border border-hairline bg-charcoal transition-colors hover:border-amber/40 has-[a:focus-visible]:border-amber"
               >
-                {/* Art and title link through to the piece's own page; the
-                    play button stays a button. A card-wide link would have had
-                    to contain the play control, and a button inside a link is
-                    neither valid nor operable by keyboard. */}
                 {r.coverImageUrl && (
-                <Link href={`/listen/${r.slug}`} tabIndex={-1} aria-hidden="true">
                   <Image
                     src={r.coverImageUrl}
                     alt=""
@@ -151,7 +154,6 @@ export default function Library({
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="aspect-square w-full border-b border-hairline object-cover"
                   />
-                </Link>
                 )}
                 <div className="p-5">
                   <p className="mb-2 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-lilac">
@@ -160,7 +162,7 @@ export default function Library({
                   <h3 className="font-display mb-2.5 text-[1.125rem] font-semibold">
                     <Link
                       href={`/listen/${r.slug}`}
-                      className="text-ivory no-underline transition-colors hover:text-amber"
+                      className="text-ivory no-underline transition-colors after:absolute after:inset-0 after:content-[''] group-hover:text-amber focus-visible:outline-none"
                     >
                       {r.title}
                     </Link>
@@ -172,7 +174,11 @@ export default function Library({
                     {/* The queue is what the reader can see: the current
                         filter and search result, in displayed order. Narrow
                         to Healing and "next" stays inside Healing. */}
-                    <EpisodePlayButton recording={r} variant="icon" queue={shown} />
+                    {/* z-10 puts this above the title link's overlay, so a
+                        tap here plays rather than navigating. */}
+                    <span className="relative z-10">
+                      <EpisodePlayButton recording={r} variant="icon" queue={shown} />
+                    </span>
                     <span className="text-[0.8125rem] text-ivory/66">
                       {formatDuration(r.durationSec)}
                     </span>
