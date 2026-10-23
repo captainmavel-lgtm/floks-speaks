@@ -33,6 +33,36 @@ export type Recording = {
   coverImageUrl: string | null;
   /** Phase 4: Cloudflare R2 audio URL. Null means the player cannot start. */
   audioUrl: string | null;
+  /**
+   * Per-episode links on other platforms. Projected by every recording query
+   * but only rendered on the detail page.
+   */
+  externalLinks?: ExternalLinks | null;
+};
+
+export type ExternalLinks = {
+  spotify?: string | null;
+  apple?: string | null;
+  amazonMusic?: string | null;
+  iheart?: string | null;
+  deezer?: string | null;
+  audible?: string | null;
+};
+
+/**
+ * A recording as the detail page needs it. Everything a card needs, plus the
+ * fields that are too heavy to fetch for a grid: the transcript, the tags,
+ * and the themes dereferenced far enough to carry their own accent colour.
+ */
+export type RecordingDetail = Recording & {
+  themeMeta?: { name: string; accentColor?: string | null; slug?: string | null }[];
+  tags?: string[] | null;
+  /** Portable Text. Absent until Felix writes one; the page simply omits the section. */
+  transcript?: unknown[] | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+  } | null;
 };
 
 export type Collection = {

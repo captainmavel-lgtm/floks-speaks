@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   type Recording,
   formatDuration,
@@ -136,22 +137,33 @@ export default function Library({
                 key={r._id}
                 className="overflow-hidden rounded-2xl border border-hairline bg-charcoal"
               >
+                {/* Art and title link through to the piece's own page; the
+                    play button stays a button. A card-wide link would have had
+                    to contain the play control, and a button inside a link is
+                    neither valid nor operable by keyboard. */}
                 {r.coverImageUrl && (
-                <Image
-                  src={r.coverImageUrl}
-                  alt=""
-                  width={440}
-                  height={440}
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="aspect-square w-full border-b border-hairline object-cover"
-                />
+                <Link href={`/listen/${r.slug}`} tabIndex={-1} aria-hidden="true">
+                  <Image
+                    src={r.coverImageUrl}
+                    alt=""
+                    width={440}
+                    height={440}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    className="aspect-square w-full border-b border-hairline object-cover"
+                  />
+                </Link>
                 )}
                 <div className="p-5">
                   <p className="mb-2 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-lilac">
                     {r.theme}
                   </p>
                   <h3 className="font-display mb-2.5 text-[1.125rem] font-semibold">
-                    {r.title}
+                    <Link
+                      href={`/listen/${r.slug}`}
+                      className="text-ivory no-underline transition-colors hover:text-amber"
+                    >
+                      {r.title}
+                    </Link>
                   </h3>
                   <p className="mb-3.5 text-[0.8125rem] leading-[1.5] text-ivory/66">
                     {r.description}

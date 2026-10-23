@@ -842,6 +842,17 @@ a[class*="btn"] {
   background: rgba(17, 17, 22, 0.04);
 }
 
+/* Midnight panels. The ink colours above are invisible here, which is the
+   whole reason the caller has to declare its surface. */
+.share-btn[data-surface="dark"] {
+  border-color: var(--color-edge-dark, rgba(242, 237, 229, 0.22));
+  color: var(--color-ivory, #f2ede5);
+}
+.share-btn[data-surface="dark"]:hover {
+  border-color: var(--color-amber, #f2a33a);
+  background: rgba(242, 163, 58, 0.12);
+}
+
 /* =========================================================================
    AGENCY CREDIT (footer)
 

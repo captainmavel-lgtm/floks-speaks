@@ -12,7 +12,7 @@
 
 import { unstable_cache } from "next/cache";
 import { client, urlFor } from "./sanity";
-import type { Recording, Collection, Article } from "./content";
+import type { Recording, RecordingDetail, Collection, Article } from "./content";
 
 // ---------------------------------------------------------------------------
 // GROQ fragments — reused across queries
@@ -32,6 +32,36 @@ const RECORDING_PROJECTION = `{
   "coverImage": coverImage,
   audioUrl,
   "externalLinks": externalLinks
+}`;
+
+/**
+ * The detail page needs more than a card does. Kept as its own fragment
+ * rather than widened into RECORDING_PROJECTION above, because that one is
+ * fetched for every card in the library, every collection and the home page:
+ * pulling a full transcript into all of them to serve one page would be paid
+ * on every request that does not need it.
+ *
+ * `themeMeta` dereferences the categories into objects so the detail page can
+ * colour a chip. `themes` above stays a plain string array, because the
+ * library filter and the theme chips read it that way.
+ */
+const RECORDING_DETAIL_PROJECTION = `{
+  "_id": _id,
+  "slug": slug.current,
+  title,
+  "theme": categories[0]->name,
+  "themes": categories[]->name,
+  "themeMeta": categories[]->{ "name": name, accentColor, "slug": slug.current },
+  "description": summary,
+  "durationSec": duration,
+  "publishedAt": publishedAt,
+  "coverImageUrl": coverImage.asset->url,
+  "coverImage": coverImage,
+  audioUrl,
+  "externalLinks": externalLinks,
+  tags,
+  transcript,
+  "seo": seo
 }`;
 
 /** Project the fields that map onto our Collection type */
@@ -92,8 +122,8 @@ export const getRecordings = unstable_cache(
  */
 export const getRecordingBySlug = unstable_cache(
   async (slug: string) => {
-    const query = `*[_type == "audioTrack" && slug.current == $slug && status == "published"][0] ${RECORDING_PROJECTION}`;
-    return client.fetch<Recording | null>(query, { slug });
+    const query = `*[_type == "audioTrack" && slug.current == $slug && status == "published"][0] ${RECORDING_DETAIL_PROJECTION}`;
+    return client.fetch<RecordingDetail | null>(query, { slug });
   },
   ["recording-by-slug"],
   { revalidate: 60, tags: ["recordings"] },

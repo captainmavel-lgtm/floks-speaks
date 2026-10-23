@@ -368,10 +368,13 @@ export function podcastSeriesLd(episodes: EpisodeLdInput[] = []) {
 export function episodeLd(e: EpisodeLdInput) {
   return {
     "@type": "PodcastEpisode",
-    "@id": `${SITE_URL}/listen#${e.slug}`,
+    /* Episodes have had their own page since the detail route landed. These
+       pointed at /listen with a fragment, which told a crawler that eight
+       episodes were all the same URL. */
+    "@id": `${SITE_URL}/listen/${e.slug}`,
     name: e.title,
     description: e.description,
-    url: abs("/listen"),
+    url: abs(`/listen/${e.slug}`),
     datePublished: e.publishedAt,
     timeRequired: isoDuration(e.durationSec),
     ...(e.coverImageUrl ? { image: e.coverImageUrl } : {}),

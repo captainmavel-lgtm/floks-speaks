@@ -46,7 +46,10 @@ export default async function Home() {
   const featured = homepage?.featuredTrack ?? recordings[0];
 
   // Latest three by publish date (recordings already sorted newest-first)
-  const latest = recordings.slice(0, 3);
+  /* The hero opens on the featured piece, so Latest starts after it rather
+     than repeating it one scroll later. Without the filter the newest
+     recording is usually both, and it appeared twice on one page. */
+  const latest = recordings.filter((r) => r._id !== featured?._id).slice(0, 3);
 
   /* Themes come from the collection documents, filtered to the standing
      threads. Documents predating the `kind` field read as themes. If Sanity
@@ -186,52 +189,17 @@ export default async function Home() {
       </div>
     </section>
 
-    {/* 02 FEATURED */}
-    {featured && (
-    <section id="listen" className="border-b border-hairline">
-      <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-14">
-        <p className="mb-6 text-eyebrow font-semibold uppercase tracking-[0.16em] text-ivory/66">
-          Start here
-        </p>
-        <div className="flex flex-wrap items-center gap-10">
-          <div className="min-w-[240px] flex-[0_1_360px]">
-            {featured.coverImageUrl && (
-            <Image
-              src={featured.coverImageUrl}
-              alt={`${featured.title}, episode artwork`}
-              width={720}
-              height={720}
-              sizes="(max-width: 780px) 100vw, 360px"
-              className="w-full rounded-2xl border border-hairline object-cover shadow-[0_12px_32px_rgba(0,0,0,.4)]"
-            />
-            )}
-          </div>
-          <div className="min-w-0 flex-[1_1_420px]">
-            <span className="inline-block rounded-full border border-lilac/[0.42] px-3.5 py-[7px] text-[0.6875rem] uppercase tracking-[0.14em] text-lilac">
-              {featured.theme}
-            </span>
-            <h2 className="font-editorial my-[18px] text-h2-ed">
-              {featured.title}
-            </h2>
-            <p className="mb-6 text-lede leading-[1.7] text-ivory/86">
-              {featured.description}
-            </p>
-            <div className="flex flex-wrap items-center gap-5">
-              <EpisodePlayButton recording={featured} variant="pill" />
-              <span className="text-[0.8125rem] text-ivory/66">
-                {formatDuration(featured.durationSec)} &middot;{" "}
-                {formatDate(featured.publishedAt)}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    )}
+    {/* 02 FEATURED — removed.
+        It showed the featured piece with its art, theme, summary and a play
+        pill. The hero now opens on exactly that piece and plays it, so the
+        page was introducing the same recording twice within one screen of
+        itself, and a third time in Latest below. "Start here" is the hero's
+        job now. The id="listen" anchor it carried moves to Latest; nothing
+        linked to it. */}
 
     {/* 03 LATEST */}
     {latest.length > 0 && (
-    <section className="border-b border-hairline">
+    <section id="listen" className="border-b border-hairline">
       <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-14">
         <div className="mb-9 flex flex-wrap items-baseline justify-between gap-[18px]">
           <h2 className="font-display text-h2 font-semibold">Latest releases</h2>

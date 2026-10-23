@@ -112,6 +112,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...(c.coverImageUrl ? { images: [c.coverImageUrl] } : {}),
     }));
 
+  /* Every recording now has a page of its own. These are the deepest real
+     content on the site and the thing a search for a piece by name should
+     land on, so they outrank the collection pages that merely list them. */
+  const recordingEntries: MetadataRoute.Sitemap = recordings
+    .filter((r) => Boolean(r.slug))
+    .map((r) => ({
+      url: `${SITE_URL}/listen/${r.slug}`,
+      lastModified: r.publishedAt ? new Date(r.publishedAt) : undefined,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+      ...(r.coverImageUrl ? { images: [r.coverImageUrl] } : {}),
+    }));
+
   const articleEntries: MetadataRoute.Sitemap = articles
     .filter((a) => Boolean(a.slug))
     .map((a) => ({
@@ -122,5 +135,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...(a.coverImageUrl ? { images: [a.coverImageUrl] } : {}),
     }));
 
-  return [...staticEntries, ...collectionEntries, ...articleEntries];
+  return [
+    ...staticEntries,
+    ...recordingEntries,
+    ...collectionEntries,
+    ...articleEntries,
+  ];
 }
