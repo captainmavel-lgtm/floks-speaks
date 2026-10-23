@@ -12,7 +12,13 @@
 
 import { unstable_cache } from "next/cache";
 import { client, urlFor } from "./sanity";
-import type { Recording, RecordingDetail, Collection, Article } from "./content";
+import type {
+  Recording,
+  RecordingDetail,
+  Collection,
+  Article,
+  SiteEvent,
+} from "./content";
 
 // ---------------------------------------------------------------------------
 // GROQ fragments — reused across queries
@@ -242,7 +248,11 @@ export const getArticleBySlug = unstable_cache(
  */
 export const getEvents = unstable_cache(
   async () => {
-    const query = `*[_type == "event" && visible == true && date >= now()] | order(date asc) {
+    /* Past dates are kept, not filtered out. A ministry with a year of
+       appearances behind it reads very differently from one with an empty
+       diary, and the homepage decides what to do with them. Newest first;
+       the page splits them around today. */
+    const query = `*[_type == "event" && visible == true] | order(date desc) {
       _id,
       title,
       date,
@@ -251,7 +261,20 @@ export const getEvents = unstable_cache(
       description,
       bookingUrl
     }`;
-    return client.fetch(query);
+    const all = await client.fetch<SiteEvent[]>(query);
+
+    /* Split here rather than in the page. Reading the clock while rendering
+       is an impure call, and this function is already the thing that runs on
+       a 60s cadence, which is far finer than an event needs.
+       Upcoming runs soonest-first, because the next date is the one that
+       matters; past stays newest-first, which is the order a reader scans a
+       history in. */
+    const now = Date.now();
+    const upcoming = all
+      .filter((e) => Date.parse(e.date) >= now)
+      .sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+    const past = all.filter((e) => Date.parse(e.date) < now);
+    return { upcoming, past };
   },
   ["events"],
   { revalidate: 60, tags: ["events"] },

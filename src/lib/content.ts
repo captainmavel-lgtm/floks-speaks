@@ -65,6 +65,18 @@ export type RecordingDetail = Recording & {
   } | null;
 };
 
+/** An appearance, past or upcoming. `visible` is filtered in the query. */
+export type SiteEvent = {
+  _id: string;
+  title: string;
+  /** ISO datetime. The homepage splits past from upcoming around today. */
+  date: string;
+  venue?: string | null;
+  location?: string | null;
+  description?: string | null;
+  bookingUrl?: string | null;
+};
+
 export type Collection = {
   _id: string;
   slug: string;
@@ -270,7 +282,27 @@ export function spokenDuration(seconds: number): string {
 }
 
 export function formatDate(iso: string): string {
-  const d = new Date(`${iso.length === 7 ? `${iso}-01` : iso}T00:00:00Z`);
+  if (!iso) return "";
+  /* Two shapes arrive here and they cannot be treated the same.
+   *
+   * A date-only string needs a time pinned to it, and specifically a UTC one:
+   * "2026-10-04" parsed bare is UTC midnight, which in Accra reads as the 4th
+   * but in Toronto reads as the 3rd, so a milestone would slide a day
+   * backwards for half the audience.
+   *
+   * A Sanity `datetime` field returns a full ISO string that is already
+   * unambiguous. Appending the time to that produced
+   * "2026-10-04T18:00:00ZT00:00:00Z", an invalid date, and this function
+   * returned "" for it — which is why every publishedAt on the site, on blog
+   * articles, recordings, collections and the journal strip, was rendering
+   * as nothing at all. It failed silently: an empty string looks like a
+   * design choice, not a bug. */
+  const value = /^\d{4}-\d{2}$/.test(iso)
+    ? `${iso}-01T00:00:00Z`
+    : /^\d{4}-\d{2}-\d{2}$/.test(iso)
+      ? `${iso}T00:00:00Z`
+      : iso;
+  const d = new Date(value);
   if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleDateString("en-GB", {
     day: "numeric",

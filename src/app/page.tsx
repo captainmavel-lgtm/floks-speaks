@@ -7,7 +7,13 @@ import {
   formatDuration,
   formatDate,
 } from "@/lib/content";
-import { getRecordings, getHomepage, getArticles, getCollections } from "@/lib/sanity-queries";
+import {
+  getRecordings,
+  getHomepage,
+  getArticles,
+  getCollections,
+  getEvents,
+} from "@/lib/sanity-queries";
 import ThemeChips from "@/components/theme-chips";
 
 export const instant = false;
@@ -35,12 +41,17 @@ export const metadata = pageMeta({
    ========================================================================= */
 
 export default async function Home() {
-  const [recordings, homepage, articles, collections] = await Promise.all([
+  const [recordings, homepage, articles, collections, events] = await Promise.all([
     getRecordings(),
     getHomepage(),
     getArticles(),
     getCollections(),
+    getEvents(),
   ]);
+
+  /* Already split around today by getEvents, which does it on its own cache
+     cadence rather than from the render body. */
+  const { upcoming: upcomingEvents, past: pastEvents } = events;
 
   // Featured track from the homepage singleton, or fall back to first recording
   const featured = homepage?.featuredTrack ?? recordings[0];
@@ -391,30 +402,99 @@ export default async function Home() {
       </div>
     </section>
 
-    {/* 07 EVENTS */}
+    {/* 07 EVENTS
+        The section used to be a dashed box reading "No dates in the diary
+        right now", permanently, because nothing here ever read the events
+        from Sanity. A placeholder that can never fill itself is worse than
+        no section: it tells every visitor the diary is empty.
+
+        It now renders only when there is something real to show, and it
+        disappears again on its own when there is not. Publishing an event in
+        the Studio with "Show on site" ticked is the whole of the work.
+
+        Past dates count. A reader deciding whether to book someone wants to
+        see where he has already been, and an artist with a year of
+        appearances behind him should not look like one with none. */}
+    {(upcomingEvents.length > 0 || pastEvents.length > 0) && (
     <section className="border-b border-hairline">
       <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-14">
-        <h2 className="font-display mb-7 text-h2 font-semibold">
-          Events &amp; appearances
-        </h2>
-        <div className="flex flex-wrap items-center justify-between gap-5 rounded-2xl border border-dashed border-edge-dark p-8">
-          <div>
-            <p className="font-display m-0 mb-1.5 text-[1.1875rem] font-semibold">
-              No dates in the diary right now.
-            </p>
-            <p className="m-0 text-[0.9375rem] text-ivory/70">
-              Available for church services, conferences, schools and festivals.
-            </p>
-          </div>
-          <Link
-            href="/contact"
-            className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-amber px-[30px] text-[0.9375rem] font-semibold text-midnight no-underline"
-          >
-            Book Floks
+        <div className="mb-7 flex flex-wrap items-baseline justify-between gap-4">
+          <h2 className="font-display text-h2 font-semibold">
+            Events &amp; appearances
+          </h2>
+          <Link href="/contact" className="text-[0.875rem] text-amber">
+            Book Floks &rarr;
           </Link>
         </div>
+
+        {upcomingEvents.length > 0 && (
+          <ul className="m-0 mb-10 grid list-none gap-4 p-0 last:mb-0 sm:grid-cols-2">
+            {upcomingEvents.map((e) => (
+              <li
+                key={e._id}
+                className="rounded-2xl border border-amber/35 bg-charcoal p-6"
+              >
+                <p className="m-0 mb-2 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-amber">
+                  {formatDate(e.date)}
+                </p>
+                <h3 className="font-display m-0 mb-1.5 text-[1.1875rem] font-semibold">
+                  {e.title}
+                </h3>
+                {(e.venue || e.location) && (
+                  <p className="m-0 text-[0.9375rem] text-ivory/72">
+                    {[e.venue, e.location].filter(Boolean).join(", ")}
+                  </p>
+                )}
+                {e.description && (
+                  <p className="m-0 mt-3 text-[0.9375rem] leading-[1.6] text-ivory/70">
+                    {e.description}
+                  </p>
+                )}
+                {e.bookingUrl && (
+                  <a
+                    href={e.bookingUrl}
+                    target="_blank"
+                    rel="noopener"
+                    className="mt-4 inline-flex min-h-[44px] items-center text-[0.9375rem] font-semibold text-amber no-underline"
+                  >
+                    Details and tickets &rarr;
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {pastEvents.length > 0 && (
+          <>
+            <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-ivory/55">
+              Previously
+            </p>
+            {/* Quieter than the upcoming cards on purpose: a record of where
+                he has been, not a call to go somewhere. */}
+            <ul className="m-0 grid list-none gap-x-8 gap-y-3 p-0 sm:grid-cols-2">
+              {pastEvents.map((e) => (
+                <li
+                  key={e._id}
+                  className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-hairline py-3 text-[0.9375rem]"
+                >
+                  <span className="tabular-nums text-ivory/55">
+                    {formatDate(e.date)}
+                  </span>
+                  <span className="font-semibold text-ivory/85">{e.title}</span>
+                  {(e.venue || e.location) && (
+                    <span className="text-ivory/55">
+                      {[e.venue, e.location].filter(Boolean).join(", ")}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </div>
     </section>
+    )}
 
     {/* 08 WEAR THE MESSAGE */}
     <section

@@ -32,7 +32,7 @@ export const event = defineType({
       title: "Show on site",
       type: "boolean",
       description:
-        "The Events section on the homepage hides automatically when there are no visible, upcoming events.",
+        "Untick to hide this event from the site without deleting it. The Events section on the homepage appears only when at least one visible event exists, past or upcoming, and hides itself again when none do. A date in the past moves to the Previously list rather than disappearing.",
       initialValue: true,
     }),
   ],
