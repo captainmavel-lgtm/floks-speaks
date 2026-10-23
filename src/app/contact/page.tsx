@@ -120,9 +120,6 @@ export default function ContactPage() {
                 </a>
               </li>
             </ul>
-            <p className="m-0 mt-3 text-[0.875rem] leading-[1.6] text-midnight/62">
-              Ghana is on GMT, with no daylight saving.
-            </p>
           </div>
 
           {/* surface="ink" because this row sits on the Ivory page. The footer

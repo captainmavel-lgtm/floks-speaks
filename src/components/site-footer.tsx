@@ -105,9 +105,6 @@ export default function SiteFooter() {
                 {CONTACT_PHONE_DISPLAY}
               </a>
             </div>
-            <p className="mt-3.5 text-[0.875rem] text-ivory/66">
-              Accra, Ghana. GMT, no daylight saving.
-            </p>
           </div>
 
           <div className="flex-[1_1_240px]">
