@@ -71,6 +71,8 @@ export type SiteEvent = {
   title: string;
   /** ISO datetime. The homepage splits past from upcoming around today. */
   date: string;
+  /** Optional finish. ISO datetime, same shape as `date`. */
+  endDate?: string | null;
   venue?: string | null;
   location?: string | null;
   description?: string | null;
@@ -279,6 +281,68 @@ export function spokenDuration(seconds: number): string {
     (m ? `${m} ${m === 1 ? "minute" : "minutes"} ` : "") +
     `${r} ${r === 1 ? "second" : "seconds"}`
   );
+}
+
+/* Events happen in Ghana, so their clock is Ghana's. Accra is GMT all year,
+   with no daylight saving, which is why this is a fixed zone rather than the
+   reader's: a Toronto visitor should see the time the doors open in Accra,
+   not what that instant reads as on their own wall. */
+const EVENT_TZ = "Africa/Accra";
+
+function eventParts(iso: string) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  const hhmm = new Intl.DateTimeFormat("en-GB", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: EVENT_TZ,
+  }).formatToParts(d);
+  const get = (t: string) => hhmm.find((p) => p.type === t)?.value ?? "";
+  return {
+    date: d,
+    hour: get("hour"),
+    minute: get("minute"),
+    period: get("dayPeriod").toLowerCase(),
+  };
+}
+
+/**
+ * "6 Dec 2026", or with a time "6 Dec 2026 · 6:00 pm", or with both
+ * "6 Dec 2026 · 6:00 – 9:00 pm".
+ *
+ * Midnight is treated as "no time was given" rather than printed as 12:00 am.
+ * Sanity's datetime picker defaults to midnight when an editor fills in only
+ * the date, so printing it would put a fictitious start time on every event
+ * whose time is genuinely not settled yet.
+ *
+ * The meridiem is dropped from the start of a range when both ends share it,
+ * because "6:00 pm – 9:00 pm" says pm twice to no purpose.
+ */
+export function formatEventWhen(iso: string, endIso?: string | null): string {
+  const start = eventParts(iso);
+  if (!start) return "";
+
+  const day = formatDate(iso);
+  const atMidnight = start.hour === "12" && start.minute === "00" && start.period === "am";
+  if (atMidnight) return day;
+
+  const end = endIso ? eventParts(endIso) : null;
+  /* An evening that runs past midnight still reads correctly as a range —
+     "6:00 pm – 1:00 am" is how anyone would write it. What does not is a
+     multi-day festival, where a pair of clock times says nothing useful, so
+     anything longer than a day shows its start and lets the description carry
+     the rest. */
+  const withinOneDay =
+    end && end.date.getTime() - start.date.getTime() <= 24 * 60 * 60 * 1000;
+
+  const startLabel = `${start.hour}:${start.minute}`;
+  if (!end || !withinOneDay) return `${day} · ${startLabel} ${start.period}`;
+
+  const endLabel = `${end.hour}:${end.minute} ${end.period}`;
+  return start.period === end.period
+    ? `${day} · ${startLabel} – ${endLabel}`
+    : `${day} · ${startLabel} ${start.period} – ${endLabel}`;
 }
 
 export function formatDate(iso: string): string {

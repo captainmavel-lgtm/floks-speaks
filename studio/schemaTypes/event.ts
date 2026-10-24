@@ -14,9 +14,28 @@ export const event = defineType({
     }),
     defineField({
       name: "date",
-      title: "Date",
+      title: "Starts",
       type: "datetime",
+      description:
+        "Date and start time. Times are shown on the site in Ghana time (GMT). This picker uses YOUR computer's clock, so if you are entering from outside Ghana, convert first: 6pm in Accra is 2pm in Toronto during daylight saving, 1pm otherwise. Leave the time at midnight to show the date only.",
+      options: { timeStep: 15 },
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "endDate",
+      title: "Ends",
+      type: "datetime",
+      description:
+        "Optional finish time. Shown as a range after the start, so 18:00 to 21:00 reads as 6:00 to 9:00 pm. Leave empty if the finish is not fixed.",
+      options: { timeStep: 15 },
+      validation: (Rule) =>
+        Rule.custom((end, context) => {
+          const start = (context.document as { date?: string } | undefined)?.date;
+          if (!end || !start) return true;
+          return Date.parse(end as string) > Date.parse(start)
+            ? true
+            : "The finish time has to be after the start time.";
+        }),
     }),
     defineField({ name: "venue", title: "Venue", type: "string" }),
     defineField({ name: "location", title: "Location", type: "string" }),

@@ -6,6 +6,7 @@ import {
   THEME_IMAGES,
   formatDuration,
   formatDate,
+  formatEventWhen,
 } from "@/lib/content";
 import {
   getRecordings,
@@ -435,7 +436,7 @@ export default async function Home() {
                 className="rounded-2xl border border-amber/35 bg-charcoal p-6"
               >
                 <p className="m-0 mb-2 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-amber">
-                  {formatDate(e.date)}
+                  {formatEventWhen(e.date, e.endDate)}
                 </p>
                 <h3 className="font-display m-0 mb-1.5 text-[1.1875rem] font-semibold">
                   {e.title}
@@ -478,6 +479,10 @@ export default async function Home() {
                   key={e._id}
                   className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-hairline py-3 text-[0.9375rem]"
                 >
+                  {/* Date only here. On an upcoming card the time is what a
+                      reader needs in order to turn up; on something already
+                      done it is trivia, and a clock range would crowd a row
+                      that has to hold a title and a venue too. */}
                   <span className="tabular-nums text-ivory/55">
                     {formatDate(e.date)}
                   </span>

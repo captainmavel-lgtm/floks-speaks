@@ -256,6 +256,7 @@ export const getEvents = unstable_cache(
       _id,
       title,
       date,
+      endDate,
       venue,
       location,
       description,
