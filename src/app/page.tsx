@@ -436,7 +436,7 @@ export default async function Home() {
                 className="rounded-2xl border border-amber/35 bg-charcoal p-6"
               >
                 <p className="m-0 mb-2 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-amber">
-                  {formatEventWhen(e.date, e.endDate)}
+                  {formatEventWhen(e.date, e.startTime, e.endTime)}
                 </p>
                 <h3 className="font-display m-0 mb-1.5 text-[1.1875rem] font-semibold">
                   {e.title}

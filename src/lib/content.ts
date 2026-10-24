@@ -70,9 +70,11 @@ export type SiteEvent = {
   _id: string;
   title: string;
   /** ISO datetime. The homepage splits past from upcoming around today. */
+  /** "YYYY-MM-DD". Older rows may still hold a full ISO datetime. */
   date: string;
-  /** Optional finish. ISO datetime, same shape as `date`. */
-  endDate?: string | null;
+  /** "HH:MM" on a 24-hour clock, Ghana time. Plain text, never converted. */
+  startTime?: string | null;
+  endTime?: string | null;
   venue?: string | null;
   location?: string | null;
   description?: string | null;
@@ -283,66 +285,48 @@ export function spokenDuration(seconds: number): string {
   );
 }
 
-/* Events happen in Ghana, so their clock is Ghana's. Accra is GMT all year,
-   with no daylight saving, which is why this is a fixed zone rather than the
-   reader's: a Toronto visitor should see the time the doors open in Accra,
-   not what that instant reads as on their own wall. */
-const EVENT_TZ = "Africa/Accra";
+/* Events are typed in Ghana time and stored as plain text, so nothing here
+   converts anything. See the comment on the event schema for why: a `datetime`
+   field reads the editor's own computer clock, so 13:00 entered from Toronto
+   became 17:00 UTC and the site showed 5pm. The number on the screen has to be
+   the number that was typed. */
 
-function eventParts(iso: string) {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return null;
-  const hhmm = new Intl.DateTimeFormat("en-GB", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-    timeZone: EVENT_TZ,
-  }).formatToParts(d);
-  const get = (t: string) => hhmm.find((p) => p.type === t)?.value ?? "";
-  return {
-    date: d,
-    hour: get("hour"),
-    minute: get("minute"),
-    period: get("dayPeriod").toLowerCase(),
-  };
+/** The day, tolerant of a legacy full-ISO value from when this was a datetime. */
+function eventDay(date: string): string {
+  return formatDate(date.slice(0, 10));
+}
+
+/** "13:00" → 13.0, for ordering and for spotting a finish past midnight. */
+function minutesOf(hhmm: string): number | null {
+  const m = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(hhmm.trim());
+  if (!m) return null;
+  return Number(m[1]) * 60 + Number(m[2]);
 }
 
 /**
- * "6 Dec 2026", or with a time "6 Dec 2026 · 6:00 pm", or with both
- * "6 Dec 2026 · 6:00 – 9:00 pm".
+ * "6 Dec 2026", or "6 Dec 2026 · 13:00 GMT", or
+ * "6 Dec 2026 · 13:00 – 16:00 GMT".
  *
- * Midnight is treated as "no time was given" rather than printed as 12:00 am.
- * Sanity's datetime picker defaults to midnight when an editor fills in only
- * the date, so printing it would put a fictitious start time on every event
- * whose time is genuinely not settled yet.
- *
- * The meridiem is dropped from the start of a range when both ends share it,
- * because "6:00 pm – 9:00 pm" says pm twice to no purpose.
+ * Times print exactly as typed, on the 24-hour clock, because that is what was
+ * asked for and because a 24-hour reading cannot be misread as the other half
+ * of the day. GMT is stated once so a reader outside Ghana knows which clock
+ * they are looking at rather than assuming their own.
  */
-export function formatEventWhen(iso: string, endIso?: string | null): string {
-  const start = eventParts(iso);
-  if (!start) return "";
+export function formatEventWhen(
+  date: string,
+  startTime?: string | null,
+  endTime?: string | null,
+): string {
+  const day = eventDay(date);
+  if (!day) return "";
 
-  const day = formatDate(iso);
-  const atMidnight = start.hour === "12" && start.minute === "00" && start.period === "am";
-  if (atMidnight) return day;
+  const start = startTime ? minutesOf(startTime) : null;
+  if (start === null) return day;
 
-  const end = endIso ? eventParts(endIso) : null;
-  /* An evening that runs past midnight still reads correctly as a range —
-     "6:00 pm – 1:00 am" is how anyone would write it. What does not is a
-     multi-day festival, where a pair of clock times says nothing useful, so
-     anything longer than a day shows its start and lets the description carry
-     the rest. */
-  const withinOneDay =
-    end && end.date.getTime() - start.date.getTime() <= 24 * 60 * 60 * 1000;
+  const end = endTime ? minutesOf(endTime) : null;
+  if (end === null) return `${day} · ${startTime!.trim()} GMT`;
 
-  const startLabel = `${start.hour}:${start.minute}`;
-  if (!end || !withinOneDay) return `${day} · ${startLabel} ${start.period}`;
-
-  const endLabel = `${end.hour}:${end.minute} ${end.period}`;
-  return start.period === end.period
-    ? `${day} · ${startLabel} – ${endLabel}`
-    : `${day} · ${startLabel} ${start.period} – ${endLabel}`;
+  return `${day} · ${startTime!.trim()} – ${endTime!.trim()} GMT`;
 }
 
 export function formatDate(iso: string): string {

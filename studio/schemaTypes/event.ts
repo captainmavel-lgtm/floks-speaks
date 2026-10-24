@@ -12,30 +12,47 @@ export const event = defineType({
       type: "string",
       validation: (Rule) => Rule.required(),
     }),
+    /* Date and time are stored separately, and the time as plain text.
+     *
+     * This was a `datetime`, which looks like the right type and is a trap:
+     * the Studio's picker reads the EDITOR's computer clock and stores the UTC
+     * instant. Setting 13:00 from Toronto stored 17:00 UTC, and the site,
+     * rendering Ghana time, showed 5pm. Correct, and useless — the number on
+     * the screen was not the number that was typed.
+     *
+     * A plain string cannot be converted by anything, so what is typed is what
+     * is shown. Everything here happens in Ghana, which is GMT all year with
+     * no daylight saving, so there is no second timezone to reconcile. */
     defineField({
       name: "date",
-      title: "Starts",
-      type: "datetime",
-      description:
-        "Date and start time. Times are shown on the site in Ghana time (GMT). This picker uses YOUR computer's clock, so if you are entering from outside Ghana, convert first: 6pm in Accra is 2pm in Toronto during daylight saving, 1pm otherwise. Leave the time at midnight to show the date only.",
-      options: { timeStep: 15 },
+      title: "Date",
+      type: "date",
+      options: { dateFormat: "D MMMM YYYY" },
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: "endDate",
-      title: "Ends",
-      type: "datetime",
+      name: "startTime",
+      title: "Start time",
+      type: "string",
       description:
-        "Optional finish time. Shown as a range after the start, so 18:00 to 21:00 reads as 6:00 to 9:00 pm. Leave empty if the finish is not fixed.",
-      options: { timeStep: 15 },
+        "24-hour clock, Ghana time, e.g. 13:00 for 1pm. Shown on the site exactly as typed. Leave empty if the time is not settled and only the date will show.",
       validation: (Rule) =>
-        Rule.custom((end, context) => {
-          const start = (context.document as { date?: string } | undefined)?.date;
-          if (!end || !start) return true;
-          return Date.parse(end as string) > Date.parse(start)
-            ? true
-            : "The finish time has to be after the start time.";
-        }),
+        Rule.regex(/^([01]\d|2[0-3]):[0-5]\d$/, {
+          name: "time",
+          invert: false,
+        }).error("Use HH:MM on a 24-hour clock, for example 09:30 or 18:00."),
+    }),
+    defineField({
+      name: "endTime",
+      title: "Finish time",
+      type: "string",
+      description:
+        "Optional, same format. Shown as a range after the start. A finish earlier than the start is read as running past midnight.",
+      validation: (Rule) =>
+        Rule.regex(/^([01]\d|2[0-3]):[0-5]\d$/, {
+          name: "time",
+          invert: false,
+        }).error("Use HH:MM on a 24-hour clock, for example 21:00."),
     }),
     defineField({ name: "venue", title: "Venue", type: "string" }),
     defineField({ name: "location", title: "Location", type: "string" }),

@@ -256,7 +256,8 @@ export const getEvents = unstable_cache(
       _id,
       title,
       date,
-      endDate,
+      startTime,
+      endTime,
       venue,
       location,
       description,
@@ -270,11 +271,26 @@ export const getEvents = unstable_cache(
        Upcoming runs soonest-first, because the next date is the one that
        matters; past stays newest-first, which is the order a reader scans a
        history in. */
+    /* The instant an event starts, built from the date and the typed time.
+       Ghana is GMT with no daylight saving, so the typed clock time IS the
+       UTC time and no conversion is needed — the Z is the whole trick.
+       Without the time, an event happening this evening would move itself to
+       "Previously" at midnight, hours before it had taken place. Falling back
+       to the end of the day keeps it listed as upcoming until the day is
+       genuinely over. */
+    const startsAt = (e: SiteEvent) => {
+      const day = e.date.slice(0, 10);
+      const time = /^([01]\d|2[0-3]):[0-5]\d$/.test((e.startTime ?? "").trim())
+        ? e.startTime!.trim()
+        : "23:59";
+      return Date.parse(`${day}T${time}:00Z`);
+    };
+
     const now = Date.now();
     const upcoming = all
-      .filter((e) => Date.parse(e.date) >= now)
-      .sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
-    const past = all.filter((e) => Date.parse(e.date) < now);
+      .filter((e) => startsAt(e) >= now)
+      .sort((a, b) => startsAt(a) - startsAt(b));
+    const past = all.filter((e) => startsAt(e) < now);
     return { upcoming, past };
   },
   ["events"],
