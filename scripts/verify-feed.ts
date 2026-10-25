@@ -22,6 +22,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { buildFeed } from "../src/lib/podcast-feed.ts";
 import type { FeedRecording } from "../src/lib/sanity-queries.ts";
+import { AUDIO_HOST } from "../src/lib/audio-host.ts";
 
 const ROOT = join(import.meta.dirname, "..");
 const BASELINE = join(ROOT, "docs/phase5/anchor-feed-baseline.json");
@@ -30,9 +31,6 @@ const SNAPSHOT = join(ROOT, "docs/phase5/sanity-catalogue-snapshot.json");
 const PROJECT = "0j0cu34s";
 const DATASET = "production";
 
-/* Must mirror the default in src/lib/podcast-feed.ts. */
-const AUDIO_HOST =
-  process.env.AUDIO_HOST ?? "pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev";
 
 type Baseline = {
   episodeCount: number;

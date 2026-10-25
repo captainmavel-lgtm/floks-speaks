@@ -11,7 +11,7 @@
    ========================================================================= */
 
 import { unstable_cache } from "next/cache";
-import { client, urlFor } from "./sanity";
+import { cmsFetch, urlFor } from "./sanity";
 import type {
   Recording,
   RecordingDetail,
@@ -117,7 +117,7 @@ const ARTICLE_PROJECTION = `{
 export const getRecordings = unstable_cache(
   async () => {
     const query = `*[_type == "audioTrack" && status == "published"] | order(publishedAt desc) ${RECORDING_PROJECTION}`;
-    return client.fetch<Recording[]>(query);
+    return cmsFetch<Recording[]>(query);
   },
   ["recordings"],
   { revalidate: 60, tags: ["recordings"] },
@@ -129,7 +129,7 @@ export const getRecordings = unstable_cache(
 export const getRecordingBySlug = unstable_cache(
   async (slug: string) => {
     const query = `*[_type == "audioTrack" && slug.current == $slug && status == "published"][0] ${RECORDING_DETAIL_PROJECTION}`;
-    return client.fetch<RecordingDetail | null>(query, { slug });
+    return cmsFetch<RecordingDetail | null>(query, { slug });
   },
   ["recording-by-slug"],
   { revalidate: 60, tags: ["recordings"] },
@@ -141,7 +141,7 @@ export const getRecordingBySlug = unstable_cache(
 export const getCollections = unstable_cache(
   async () => {
     const query = `*[_type == "collection"] | order(name asc) ${COLLECTION_PROJECTION}`;
-    return client.fetch<Collection[]>(query);
+    return cmsFetch<Collection[]>(query);
   },
   ["collections"],
   { revalidate: 60, tags: ["collections"] },
@@ -154,7 +154,7 @@ export const getCollections = unstable_cache(
 export const getThemes = unstable_cache(
   async () => {
     const query = `*[_type == "collection"] | order(name asc) { "name": name }`;
-    const result = await client.fetch<{ name: string }[]>(query);
+    const result = await cmsFetch<{ name: string }[]>(query);
     return result.map((c) => c.name);
   },
   ["themes"],
@@ -181,7 +181,7 @@ export const getCollectionBySlug = unstable_cache(
         _type == "audioTrack" && status == "published" && references(^._id)
       ] | order(publishedAt desc) ${RECORDING_PROJECTION}
     }`;
-    return client.fetch<{
+    return cmsFetch<{
       _id: string;
       slug: string;
       title: string;
@@ -208,7 +208,7 @@ export const getHomepage = unstable_cache(
       "curatedCollections": curatedCollections[]->${COLLECTION_PROJECTION},
       eventHighlight
     }`;
-    return client.fetch<{
+    return cmsFetch<{
       heroHeadline?: string;
       featuredTrack?: Recording;
       curatedCollections?: Collection[];
@@ -225,7 +225,7 @@ export const getHomepage = unstable_cache(
 export const getArticles = unstable_cache(
   async () => {
     const query = `*[_type == "blogPost" && status == "published"] | order(publishedAt desc) ${ARTICLE_PROJECTION}`;
-    return client.fetch<Article[]>(query);
+    return cmsFetch<Article[]>(query);
   },
   ["articles"],
   { revalidate: 60, tags: ["articles"] },
@@ -237,7 +237,7 @@ export const getArticles = unstable_cache(
 export const getArticleBySlug = unstable_cache(
   async (slug: string) => {
     const query = `*[_type == "blogPost" && slug.current == $slug && status == "published"][0] ${ARTICLE_PROJECTION}`;
-    return client.fetch<Article | null>(query, { slug });
+    return cmsFetch<Article | null>(query, { slug });
   },
   ["article-by-slug"],
   { revalidate: 60, tags: ["articles"] },
@@ -263,7 +263,7 @@ export const getEvents = unstable_cache(
       description,
       bookingUrl
     }`;
-    const all = await client.fetch<SiteEvent[]>(query);
+    const all = await cmsFetch<SiteEvent[]>(query);
 
     /* Split here rather than in the page. Reading the clock while rendering
        is an impure call, and this function is already the thing that runs on
@@ -311,7 +311,7 @@ export const getSiteSettings = unstable_cache(
       ...,
       "podcastArtworkUrl": podcastArtwork.asset->url
     }`;
-    return client.fetch(query);
+    return cmsFetch(query);
   },
   ["site-settings"],
   { revalidate: 300, tags: ["site-settings"] },
@@ -363,7 +363,7 @@ export const getFeedRecordings = unstable_cache(
       explicit,
       "coverImageUrl": coverImage.asset->url
     }`;
-    return client.fetch<FeedRecording[]>(query);
+    return cmsFetch<FeedRecording[]>(query);
   },
   ["feed-recordings"],
   { revalidate: 60, tags: ["recordings"] },

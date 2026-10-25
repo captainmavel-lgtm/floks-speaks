@@ -9,6 +9,12 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    /* Lets a relative import carry its .ts extension. Needed because the feed
+       builder is imported both by the Next build and by scripts/verify-feed.ts,
+       which Node runs straight from TypeScript and which resolves relative
+       imports only when they are spelled with their extension. Safe here:
+       resolution is "bundler" and nothing is emitted. */
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",

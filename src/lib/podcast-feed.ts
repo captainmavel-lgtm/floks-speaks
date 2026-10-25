@@ -34,34 +34,13 @@
    ========================================================================= */
 
 import type { FeedRecording } from "./sanity-queries";
+import { publicAudioUrl } from "./audio-host.ts";
 
 const SITE = "https://floksspeaks.org";
 
-/* Audio is stored in R2 and Sanity records whichever hostname the uploader
-   wrote at the time. Rewriting here rather than rewriting the documents keeps
-   Sanity as the record of what was uploaded, and lets the hostname move again
-   without touching content.
-
-   The default is the r2.dev hostname because it is the one that is verified
-   working. media.floksspeaks.org was tried first and served
-   ERR_SSL_VERSION_OR_CIPHER_MISMATCH: the DNS record resolves but Cloudflare
-   has not issued a certificate for it, so the custom domain is not finished
-   connecting on the bucket. An enclosure pointing there would fail for every
-   listener and, worse, be cached as a failure by some apps.
-
-   r2.dev is Cloudflare's development URL. It is rate limited and documented
-   as unsuitable for production traffic, which is exactly what a podcast
-   enclosure attracts, so this is a deliberate stopgap and not the end state.
-   Once the custom domain serves audio over HTTPS, set AUDIO_HOST to
-   media.floksspeaks.org in Netlify and redeploy. Nothing else changes, and
-   changing it is safe at any time: apps identify an episode by GUID, never
-   by its audio URL.
-
-   Verify before flipping it, with a browser or:
-     curl -I https://media.floksspeaks.org/episodes/education.mp3
-   A working host answers 200 with Content-Type: audio/mpeg. */
-const AUDIO_HOST = process.env.AUDIO_HOST ?? "pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev";
-const R2_DEV_HOST = "pub-045841bc9a9d4e4fb0a6245f95a01bf3.r2.dev";
+/* The host every enclosure is served from now lives in one module, shared
+   with the site's own player, so the feed and the website can never disagree
+   about where an episode's audio is. See src/lib/audio-host.ts. */
 
 /* Fallbacks are the values the Anchor feed is serving today, not invented
    defaults. If siteSettings is absent or a field is blank, the directories
@@ -125,18 +104,22 @@ function hhmmss(totalSeconds: number): string {
   return `${pad(h)}:${pad(m)}:${pad(sec)}`;
 }
 
-/** Point an enclosure at the production media host. */
+/**
+ * Point an enclosure at the production media host.
+ *
+ * Differs from publicAudioUrl in one way, deliberately: a URL that will not
+ * parse returns empty here, so isPlayable drops the episode. On a web page a
+ * broken audio link is one dead play button; in a feed it is an enclosure
+ * every podcast app will try, fail, and cache the failure for.
+ */
 function audioUrl(stored: string): string {
   if (!stored) return "";
   try {
-    const u = new URL(stored);
-    if (u.hostname === R2_DEV_HOST) u.hostname = AUDIO_HOST;
-    return u.toString();
+    new URL(stored);
   } catch {
-    // Not a parseable URL. Emitting it raw would produce an enclosure no
-    // app can fetch, so the caller drops the episode instead.
     return "";
   }
+  return publicAudioUrl(stored);
 }
 
 /**
