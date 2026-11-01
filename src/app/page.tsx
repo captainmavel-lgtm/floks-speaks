@@ -389,7 +389,7 @@ export default async function Home() {
                 <p className="mb-4 text-[0.9375rem] leading-[1.65] text-midnight/70">
                   {a.excerpt}
                 </p>
-                <span className="text-[0.8125rem] text-midnight/55">
+                <span className="text-[0.8125rem] text-midnight/60">
                   {formatDate(a.publishedAt)} &middot; {a.readMins} min read
                 </span>
               </article>

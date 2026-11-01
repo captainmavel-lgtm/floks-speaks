@@ -192,7 +192,7 @@ export default async function BlogArticlePage({
 
           {/* SHARE */}
           <div className="mt-12 border-t border-hairline-ink pt-8">
-            <p className="mb-4 text-[0.75rem] uppercase tracking-[0.08em] text-midnight/55">
+            <p className="mb-4 text-[0.75rem] uppercase tracking-[0.08em] text-midnight/60">
               Share this article
             </p>
             <ShareButtons

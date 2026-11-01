@@ -178,7 +178,7 @@ export default async function CollectionPage({
                   <span className="shrink-0 text-[0.8125rem] tabular-nums text-ivory/60">
                     {formatDuration(r.durationSec)}
                   </span>
-                  <span className="hidden shrink-0 text-[0.8125rem] text-ivory/44 lg:block">
+                  <span className="hidden shrink-0 text-[0.8125rem] text-ivory/50 lg:block">
                     {formatDate(r.publishedAt)}
                   </span>
                 </li>
