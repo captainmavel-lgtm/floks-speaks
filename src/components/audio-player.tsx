@@ -282,6 +282,43 @@ function PlayerBar() {
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
+      {/* Spoken status, for screen readers only.
+
+          The transport buttons already relabel themselves ("Play" becomes
+          "Pause"), which a screen reader announces only while focus is on that
+          button. Someone who starts a piece and then tabs away, or who drives
+          playback from the lock screen, otherwise gets no confirmation that
+          anything happened. This region speaks the change wherever focus is.
+
+          aria-pressed is deliberately NOT used on the play control: pairing a
+          toggle state with a label that already swaps makes a screen reader
+          announce both, which is worse than either alone. */}
+      <p
+        role="status"
+        aria-live="polite"
+        style={{
+          /* Visually hidden, still read aloud. Written out rather than using a
+             utility class: nothing else in this codebase uses one, so there is
+             no precedent proving it generates, and a utility that silently
+             fails to emit would print this text across the player. */
+          position: "absolute",
+          width: "1px",
+          height: "1px",
+          padding: 0,
+          margin: "-1px",
+          overflow: "hidden",
+          clip: "rect(0, 0, 0, 0)",
+          whiteSpace: "nowrap",
+          border: 0,
+        }}
+      >
+        {isLoading
+          ? `Loading ${track?.title}`
+          : isPlaying
+            ? `Playing ${track?.title}`
+            : `Paused. ${track?.title}`}
+      </p>
+
       {/* Scrubber — full width, sits above the main bar */}
       <div className="px-4 pt-2">
         <Scrubber current={currentTime} duration={duration} onSeek={seek} />
