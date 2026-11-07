@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { JOURNEY } from "@/lib/content";
+import { JOURNEY, formatEventWhen } from "@/lib/content";
+import { getEvents } from "@/lib/sanity-queries";
 import JsonLd from "@/components/json-ld";
 import { ID, breadcrumbLd, graph, pageMeta } from "@/lib/seo";
+
+/* This route now reads events from Sanity at request time, which Next
+   will not prerender without being told to block. Same declaration,
+   same reason, as the home page. */
+export const instant = false;
 
 export const metadata: Metadata = pageMeta({
   title: "About",
@@ -13,7 +19,10 @@ export const metadata: Metadata = pageMeta({
   image: "/og/og-about.jpg",
 });
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  /* Upcoming only. The home page carries the full history. */
+  const { upcoming: upcomingEvents } = await getEvents();
+
   return (
     <>
       {/* ProfilePage tells Google this page is ABOUT the Person node the
@@ -186,35 +195,70 @@ export default function AboutPage() {
       </section>
 
       {/* 05 EVENTS
-          Empty state, not a placeholder row. Phase 3 replaces it with the
-          published events from the CMS. */}
-      <section className="border-b border-hairline">
-        <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-16">
-          <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber">
-            Events &amp; Appearances
-          </p>
-          <h2 className="font-display mb-9 text-h2 font-semibold">
-            Where to hear him next.
-          </h2>
-          <div className="flex flex-wrap items-center justify-between gap-5 rounded-2xl border border-dashed border-edge-dark p-8">
-            <div>
-              <p className="font-display mb-1.5 text-[1.1875rem] font-semibold">
-                No dates in the diary right now.
-              </p>
-              <p className="text-[0.9375rem] leading-[1.6] text-ivory/70">
-                Available for church services, conferences, schools and
-                festivals.
-              </p>
-            </div>
-            <Link
-              href="/contact"
-              className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-amber px-[30px] text-[0.9375rem] font-semibold text-midnight"
-            >
-              Book Floks
-            </Link>
+          Wired to Sanity. This was a hardcoded dashed box reading "No dates
+          in the diary right now", permanently, because nothing here ever
+          read the events from the CMS. It told every visitor the diary was
+          empty while a published date sat in the Studio.
+
+          The same defect was found and fixed on the home page; this copy of
+          the section was missed. See the note at the events block in
+          src/app/page.tsx — a placeholder that can never fill itself is
+          worse than no section at all.
+
+          It now renders only when there is something real to show and
+          disappears on its own when there is not. The BOOKINGS section
+          directly below carries the booking call to action either way, so
+          hiding this one removes no route to an enquiry.
+
+          Upcoming only, deliberately: the heading asks where to hear him
+          NEXT, and the home page already lists past appearances. */}
+      {upcomingEvents.length > 0 && (
+        <section className="border-b border-hairline">
+          <div className="mx-auto w-full max-w-site px-(--spacing-gut) py-16">
+            <p className="mb-4 text-eyebrow font-semibold uppercase tracking-[0.16em] text-amber">
+              Events &amp; Appearances
+            </p>
+            <h2 className="font-display mb-9 text-h2 font-semibold">
+              Where to hear him next.
+            </h2>
+            <ul className="m-0 grid list-none gap-4 p-0 sm:grid-cols-2">
+              {upcomingEvents.map((e) => (
+                <li
+                  key={e._id}
+                  className="rounded-2xl border border-amber/35 bg-charcoal p-6"
+                >
+                  <p className="m-0 mb-2 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-amber">
+                    {formatEventWhen(e.date, e.startTime, e.endTime)}
+                  </p>
+                  <h3 className="font-display m-0 mb-1.5 text-[1.1875rem] font-semibold">
+                    {e.title}
+                  </h3>
+                  {(e.venue || e.location) && (
+                    <p className="m-0 text-[0.9375rem] text-ivory/72">
+                      {[e.venue, e.location].filter(Boolean).join(", ")}
+                    </p>
+                  )}
+                  {e.description && (
+                    <p className="m-0 mt-3 text-[0.9375rem] leading-[1.6] text-ivory/70">
+                      {e.description}
+                    </p>
+                  )}
+                  {e.bookingUrl && (
+                    <a
+                      href={e.bookingUrl}
+                      target="_blank"
+                      rel="noopener"
+                      className="mt-4 inline-flex min-h-[44px] items-center text-[0.9375rem] font-semibold text-amber no-underline"
+                    >
+                      Details and tickets &rarr;
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 06 BOOKINGS */}
       <section>
