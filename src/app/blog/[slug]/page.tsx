@@ -150,6 +150,7 @@ export default async function BlogArticlePage({
                 alt={article.author ?? "Author"}
                 width={44}
                 height={44}
+                sizes="44px"
                 className="h-11 w-11 rounded-full border border-hairline-ink object-cover"
               />
             )}

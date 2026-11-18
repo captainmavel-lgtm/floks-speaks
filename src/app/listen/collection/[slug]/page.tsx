@@ -106,6 +106,7 @@ export default async function CollectionPage({
                 alt=""
                 width={240}
                 height={240}
+                sizes="(min-width: 640px) 200px, 160px"
                 className="h-[160px] w-[160px] shrink-0 rounded-2xl border border-hairline object-cover sm:h-[200px] sm:w-[200px]"
               />
             )}
@@ -164,6 +165,7 @@ export default async function CollectionPage({
                       alt=""
                       width={96}
                       height={96}
+                      sizes="52px"
                       className="hidden h-[52px] w-[52px] shrink-0 rounded-lg border border-hairline object-cover sm:block"
                     />
                   )}

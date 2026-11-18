@@ -241,6 +241,7 @@ export default async function ListenPage({
                           alt=""
                           width={72}
                           height={72}
+                          sizes="52px"
                           className="h-[52px] w-[52px] rounded-lg border border-hairline object-cover"
                         />
                         )

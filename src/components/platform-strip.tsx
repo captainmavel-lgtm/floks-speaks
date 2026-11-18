@@ -31,6 +31,10 @@ export default function PlatformStrip() {
                 alt={`Listen on ${p.label}`}
                 width={140}
                 height={40}
+                /* Without sizes, Next picks a candidate from deviceSizes and
+                   serves a 384px-wide file into a 140px slot. These are flat
+                   brand lockups at a fixed display width, so name it. */
+                sizes="140px"
                 className="h-10 w-auto object-contain"
               />
             </a>
